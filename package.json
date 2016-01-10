@@ -1,0 +1,25 @@
+{
+  "name": "shokushu",
+  "version": "1.0.0",
+  "description": "Local video player using electron",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/y-takey/shokushu.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/y-takey/shokushu/issues"
+  },
+  "homepage": "https://github.com/y-takey/shokushu#readme",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.1",
+    "gulp-load-plugins": "^1.2.0"
+  }
+}
