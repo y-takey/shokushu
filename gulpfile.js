@@ -3,18 +3,18 @@ var $ = require('gulp-load-plugins')();
 var electron = require('electron-connect').server.create();
 
 var srcDir = 'src';
-var libDir = 'build';
+var distDir = 'build';
 
 gulp.task('compile', function(){
   return gulp.src(srcDir + '/**/*.{js,jsx}')
     .pipe($.babel())
-    .pipe(gulp.dest(libDir));
+    .pipe(gulp.dest(distDir));
 });
 
 // Make HTML and concats CSS files.
 gulp.task('html', function () {
   return gulp.src(srcDir + '/renderer/**/*.html')
-    .pipe(gulp.dest(libDir + '/renderer'))
+    .pipe(gulp.dest(distDir + '/renderer'))
   ;
 });
 
@@ -27,5 +27,5 @@ gulp.task('start', ['compile', 'html'], function(){
   // BrowserProcessが読み込むファイルが変更されたらRestart。
   gulp.watch(['main.js'], electron.restart);
   // RendererProcessが読み込むファイルが変更されたらReload。
-  gulp.watch(['index.html', libDir + '/**/*.{html,js,css}'], electron.reload);
+  gulp.watch(['index.html', distDir + '/**/*.{html,js,css}'], electron.reload);
 });
