@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var plumber = require('gulp-plumber');
 var $ = require('gulp-load-plugins')();
 var electron = require('electron-connect').server.create();
 
@@ -7,6 +8,7 @@ var distDir = 'build';
 
 gulp.task('compile', function(){
   return gulp.src(srcDir + '/**/*.{js,jsx}')
+    .pipe(plumber())
     .pipe($.babel())
     .pipe(gulp.dest(distDir));
 });

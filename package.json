@@ -24,7 +24,8 @@
     "electron-packager": "^5.2.0",
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.1",
-    "gulp-load-plugins": "^1.2.0"
+    "gulp-load-plugins": "^1.2.0",
+    "gulp-plumber": "^1.0.1"
   },
   "dependencies": {
     "babel-polyfill": "^6.3.14",
