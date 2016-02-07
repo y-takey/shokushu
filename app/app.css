@@ -35,3 +35,73 @@ a:hover {
   text-decoration: none;
   cursor: pointer;
 }
+
+.ReactTags__tags {
+}
+.ReactTags__tagInput {
+}
+.ReactTags__tagInput input {
+  display: block;
+  height: 24px;
+  padding: 3px 6px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+
+  text-rendering: auto;
+  color: initial;
+  letter-spacing: normal;
+  word-spacing: normal;
+  text-transform: none;
+  text-indent: 0px;
+  text-shadow: none;
+}
+.ReactTags__selected {
+}
+.ReactTags__selected .ReactTags__tag {
+  display: inline-block;
+  padding: .2em .6em .3em;
+  font-weight: bold;
+  line-height: 1;
+  color: #ffffff;
+  background-color: #00bcd4;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+  margin: .5em;
+}
+.ReactTags__selected .ReactTags__remove {
+  margin-left: .5em;
+  color: #ffffff;
+  font-weight: bold;
+}
+.ReactTags__suggestions {
+  /*position: absolute;*/
+}
+.ReactTags__suggestions ul {
+  list-style-type: none;
+  box-shadow: .05em .01em .5em rgba(0,0,0,.2);
+  background: white;
+  width: 200px;
+  padding: 0;
+  margin: 0;
+}
+.ReactTags__suggestions li {
+  border-bottom: 1px solid #ddd;
+  padding: 5px 10px;
+  margin: 0;
+}
+.ReactTags__suggestions li mark {
+  text-decoration: underline;
+  background: none;
+  font-weight: 600;
+}
+.ReactTags__suggestions ul li.active {
+  background: #b7cfe0;
+  cursor: pointer;
+}

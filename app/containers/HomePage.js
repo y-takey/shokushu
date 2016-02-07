@@ -4,7 +4,6 @@ import Home from '../components/Home';
 import * as HomeActions from '../actions/home';
 
 function mapStateToProps(state) {
-  console.log("[containers/HomePage#mapStateToProps]")
   return state;
 }
 

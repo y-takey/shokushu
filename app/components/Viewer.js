@@ -48,6 +48,13 @@ class Viewer extends Component {
 
     let filename = this.props.params.filename
     let filePath = this.props.dirPath + "/" + filename
+    let btn = (icon, handler) => {
+      return (
+        <FloatingActionButton style={style} onClick={handler.bind(this)}>
+          <i className={`fa fa-${icon}`}></i>
+        </FloatingActionButton>
+      )
+    }
     return (
       <div>
         <div className={styles.backButton}>
@@ -57,7 +64,15 @@ class Viewer extends Component {
         </div>
 
         <Card>
-          <CardMedia>
+          <CardMedia
+            overlay={[
+              btn("step-backward", this.stepBackward),
+              btn("play", this.play),
+              btn("stop", this.stop),
+              btn("step-forward", this.stepForward),
+              btn("expand", this.fullscreen)
+            ]}
+          >
             <video controls autoPlay src={filePath} ref="video"></video>
           </CardMedia>
           <CardTitle title={filename} />

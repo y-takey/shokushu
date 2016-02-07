@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 import RaisedButton from 'material-ui/lib/raised-button';
@@ -8,7 +9,7 @@ import TableRow from 'material-ui/lib/table/table-row';
 import TableBody from 'material-ui/lib/table/table-body';
 import styles from './Home.module.css';
 import Item from './Item';
-
+import Detail from './Detail';
 
 export default class Home extends Component {
 
@@ -27,24 +28,19 @@ export default class Home extends Component {
     }
   };
 
-  onHeaderClick(event, row, col) {
-    console.log(`[onRowSelection] clicked. row=${row} col=${col}`)
-    switch (col) {
-      case 1:
-        console.log("  -> is ID.");
-        break;
-      case 2:
-        console.log("  -> is Name.");
-        break;
-    }
-  }
   render() {
-    const { changeDir } = this.props
-    const { dirPath, files } = this.props.home
+    const { changeDir, sortByName, updateFav, showDetail, updateAttrs } = this.props
+    const { dirPath, files, selectedIndex } = this.props.home
+
+    let detail = null;
+    if (selectedIndex >= 0) {
+      let file = files[selectedIndex]
+      detail = <Detail file={file} tags={_.clone(file.tags)} updater={updateAttrs} />
+    }
 
     return (
       <div>
-      ディレクトリ:{dirPath}<RaisedButton label="変更" secondary={true} onClick={changeDir} />
+      ディレクトリ:{dirPath}  <RaisedButton label="変更" secondary={true} onClick={changeDir} />
       <Table
         height={Home.tableSettings.height}
         fixedHeader={Home.tableSettings.fixedHeader}
@@ -53,9 +49,11 @@ export default class Home extends Component {
         multiSelectable={Home.tableSettings.multiSelectable}
       >
         <TableHeader displaySelectAll={false} adjustForCheckbox={false} enableSelectAll={Home.tableSettings.enableSelectAll}>
-          <TableRow onCellClick={this.onHeaderClick}>
-            <TableHeaderColumn tooltip="The ID" style={Home.tableSettings.columnStyle}>ID</TableHeaderColumn>
-            <TableHeaderColumn tooltip="The Name">Name</TableHeaderColumn>
+          <TableRow onCellClick={sortByName}>
+            <TableHeaderColumn style={Home.tableSettings.columnStyle}>ID</TableHeaderColumn>
+            <TableHeaderColumn>Name</TableHeaderColumn>
+            <TableHeaderColumn>Fav</TableHeaderColumn>
+            <TableHeaderColumn>registered at</TableHeaderColumn>
           </TableRow>
         </TableHeader>
         <TableBody
@@ -63,11 +61,12 @@ export default class Home extends Component {
           showRowHover={Home.tableSettings.showRowHover}
           stripedRows={Home.tableSettings.stripedRows}
         >
-          {files.map( (filename, index) => {
-            return <Item key={filename} filename={filename} index={index} columnStyle={Home.tableSettings.columnStyle} />;
+          {files.map( (file, index) => {
+            return <Item key={file.name} file={file} index={index} columnStyle={Home.tableSettings.columnStyle} updater={updateFav} shower={showDetail}/>;
           })}
         </TableBody>
       </Table>
+      { detail }
       </div>
     );
   }
