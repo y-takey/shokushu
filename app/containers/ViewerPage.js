@@ -4,8 +4,9 @@ import Viewer from '../components/Viewer';
 import * as ViewerActions from '../actions/viewer';
 
 function mapStateToProps(state) {
+  console.log("[mapStateToProps] state:", state)
   return {
-    filename: state.filename
+    dirPath: state.home.dirPath
   };
 }
 

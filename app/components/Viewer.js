@@ -1,4 +1,12 @@
 import React, { Component, PropTypes } from 'react';
+import Card from 'material-ui/lib/card/card';
+import CardActions from 'material-ui/lib/card/card-actions';
+import CardHeader from 'material-ui/lib/card/card-header';
+import CardMedia from 'material-ui/lib/card/card-media';
+import CardTitle from 'material-ui/lib/card/card-title';
+import FlatButton from 'material-ui/lib/flat-button';
+import CardText from 'material-ui/lib/card/card-text';
+import FloatingActionButton from 'material-ui/lib/floating-action-button';
 import { Link } from 'react-router';
 import styles from './Viewer.module.css';
 
@@ -16,19 +24,30 @@ class Viewer extends Component {
 
   play() {
     console.log("clicked play");
+    this.refs.video.play();
   };
 
   stop() {
     console.log("clicked stop");
+    this.refs.video.pause();
   };
 
   stepForward() {
     console.log("clicked stepForward");
   };
 
+  fullscreen() {
+    this.refs.video.webkitRequestFullscreen();
+  }
+
   render() {
     // const { increment, incrementIfOdd, incrementAsync, decrement, counter } = this.props;
-    console.log("viewer params:", this.props.params)
+    const style = {
+      marginRight: 20,
+    };
+
+    let filename = this.props.params.filename
+    let filePath = this.props.dirPath + "/" + filename
     return (
       <div>
         <div className={styles.backButton}>
@@ -36,23 +55,34 @@ class Viewer extends Component {
             <i className="fa fa-arrow-left fa-3x" />
           </Link>
         </div>
-        <div className={`counter ${styles.counter}`}>
-          {this.props.params.filename}
-        </div>
-        <div className={styles.btnGroup}>
-          <button className={styles.btn} onClick={this.stepBackward}>
-            <i className="fa fa-step-backward"></i>
-          </button>
-          <button className={styles.btn} onClick={this.play}>
-            <i className="fa fa-play"></i>
-          </button>
-          <button className={styles.btn} onClick={this.stop}>
-            <i className="fa fa-stop"></i>
-          </button>
-          <button className={styles.btn} onClick={this.stepForward}>
-            <i className="fa fa-step-forward"></i>
-          </button>
-        </div>
+
+        <Card>
+          <CardMedia>
+            <video controls autoPlay src={filePath} ref="video"></video>
+          </CardMedia>
+          <CardTitle title={filename} />
+          <CardText>
+            tags...
+          </CardText>
+          <CardActions>
+            <FloatingActionButton style={style} onClick={this.stepBackward.bind(this)}>
+              <i className="fa fa-step-backward"></i>
+            </FloatingActionButton>
+            <FloatingActionButton style={style} onClick={this.play.bind(this)}>
+              <i className="fa fa-play"></i>
+            </FloatingActionButton>
+            <FloatingActionButton style={style} onClick={this.stop.bind(this)}>
+              <i className="fa fa-stop"></i>
+            </FloatingActionButton>
+            <FloatingActionButton style={style} onClick={this.stepForward.bind(this)}>
+              <i className="fa fa-step-forward"></i>
+            </FloatingActionButton>
+            <FloatingActionButton style={style} onClick={this.fullscreen.bind(this)}>
+              <i className="fa fa-expand"></i>
+            </FloatingActionButton>
+          </CardActions>
+        </Card>
+
       </div>
     );
   }
