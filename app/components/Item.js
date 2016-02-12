@@ -8,10 +8,6 @@ import IconButton from 'material-ui/lib/icon-button';
 export default class Item extends Component {
   constructor(props, context) {
     super(props, context)
-    // debugger
-    this.state = {
-      editing: false
-    }
   }
 
   stopPropagation(event) {

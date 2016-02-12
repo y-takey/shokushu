@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component, PropTypes } from 'react';
 import Card from 'material-ui/lib/card/card';
 import CardActions from 'material-ui/lib/card/card-actions';
@@ -17,6 +18,30 @@ class Viewer extends Component {
     incrementAsync: PropTypes.func.isRequired,
     decrement: PropTypes.func.isRequired
   };
+
+  constructor(props, context) {
+    super(props, context)
+    this.state = { showBar: true }
+    _.bindAll(this, 'onMouseMove', 'hideActionBar')
+  }
+
+  componentDidMount() {
+    this.hideActionBar();
+  }
+
+  onMouseMove() {
+    this.setState({ showBar: true })
+    this.hideActionBar();
+  }
+
+  // hide action bar after 3 sec from last operation
+  hideActionBar() {
+    clearTimeout(this.hiddenTimer);
+    this.hiddenTimer = setTimeout( () => {
+      this.setState({showBar: false})
+    }, 3000);
+
+  }
 
   stepBackward() {
     console.log("clicked stepBackward");
@@ -41,7 +66,6 @@ class Viewer extends Component {
   }
 
   render() {
-    // const { increment, incrementIfOdd, incrementAsync, decrement, counter } = this.props;
     const style = {
       marginRight: 20,
     };
@@ -56,7 +80,7 @@ class Viewer extends Component {
       )
     }
     return (
-      <div>
+      <div onMouseMove={this.onMouseMove}>
         <div className={styles.backButton}>
           <Link to="/">
             <i className="fa fa-arrow-left fa-3x" />
@@ -64,7 +88,7 @@ class Viewer extends Component {
         </div>
 
         <Card>
-          <CardMedia
+          <CardMedia overlayStyle={ { display: (this.state.showBar ? 'block' : 'none') } }
             overlay={[
               btn("step-backward", this.stepBackward),
               btn("play", this.play),
@@ -79,23 +103,6 @@ class Viewer extends Component {
           <CardText>
             tags...
           </CardText>
-          <CardActions>
-            <FloatingActionButton style={style} onClick={this.stepBackward.bind(this)}>
-              <i className="fa fa-step-backward"></i>
-            </FloatingActionButton>
-            <FloatingActionButton style={style} onClick={this.play.bind(this)}>
-              <i className="fa fa-play"></i>
-            </FloatingActionButton>
-            <FloatingActionButton style={style} onClick={this.stop.bind(this)}>
-              <i className="fa fa-stop"></i>
-            </FloatingActionButton>
-            <FloatingActionButton style={style} onClick={this.stepForward.bind(this)}>
-              <i className="fa fa-step-forward"></i>
-            </FloatingActionButton>
-            <FloatingActionButton style={style} onClick={this.fullscreen.bind(this)}>
-              <i className="fa fa-expand"></i>
-            </FloatingActionButton>
-          </CardActions>
         </Card>
 
       </div>
