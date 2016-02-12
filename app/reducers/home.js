@@ -1,6 +1,6 @@
 import fs from 'fs';
 import _ from 'lodash';
-import { CHANGE_DIR, SORT_BY_NAME, SHOW_DETAIL, UPDATE_FAV, UPDATE_ATTRS } from '../actions/home';
+import { CHANGE_DIR, SORT_BY_NAME, SHOW_DETAIL, UPDATE_FAV, SAVE_ATTRS, UPDATE_NAME, ADD_TAG, DELETE_TAG } from '../actions/home';
 
 const fileTmpl = { name: "", fav: 0, tags: [], registered_at: "" };
 
@@ -41,7 +41,7 @@ function getFiles(dirPath) {
       let stats = fs.statSync(dirPath + "/" + filename);
       obj = { name: filename, registered_at: dateFormat(stats.birthtime) }
     }
-    files.push(Object.assign({}, fileTmpl, obj))
+    files.push(Object.assign(_.cloneDeep(fileTmpl), obj))
   })
   return files;
 }
@@ -62,13 +62,15 @@ function updateFav(state, file) {
   return { files: state.files };
 }
 
-function updateAttrs(state, file) {
-  let idx = _.findIndex(state.files, { name: file.name });
+function saveAttrs(state) {
+  let file = state.selectedFile
+  let idx = _.findIndex(state.files, { name: file.originName });
   let origin = state.files[idx];
-  if (file.name !== file.attrs.name) {
-    fs.renameSync(state.dirPath + "/" + file.name, state.dirPath + "/" + file.attrs.name);
+  if (origin.name !== file.name) {
+    fs.renameSync(state.dirPath + "/" + origin.name, state.dirPath + "/" + file.name);
   }
-  Object.assign(origin, file.attrs);
+  Object.assign(origin, file);
+  delete origin.originName
   saveFiles(state.files);
   return { files: state.files };
 }
@@ -84,6 +86,7 @@ const initialState = {
 
 export default function home(state = initialState, action) {
   let newPropeties
+  let tags
   switch (action.type) {
     case CHANGE_DIR:
       newPropeties = { dirPath: action.dirPath, files: getFiles(action.dirPath) }
@@ -96,14 +99,31 @@ export default function home(state = initialState, action) {
       newPropeties.selectedIndex = undefined;
       return Object.assign({}, state, newPropeties);
     case SHOW_DETAIL:
-      return Object.assign({}, state, { selectedIndex: action.row });
+      let file = _.cloneDeep(state.files[action.row])
+      file.originName = file.name
+      return Object.assign({}, state, { selectedFile: file });
     case UPDATE_FAV:
       newPropeties = updateFav(state, action.file)
       return Object.assign({}, state, newPropeties);
-    case UPDATE_ATTRS:
-      newPropeties = updateAttrs(state, action.file)
+    case SAVE_ATTRS:
+      newPropeties = saveAttrs(state)
       return Object.assign({}, state, newPropeties);
+    case UPDATE_NAME:
+      state.selectedFile.name = action.name
+      return Object.assign({}, state, { selectedFile: state.selectedFile });
+    case ADD_TAG:
+      tags = state.selectedFile.tags;
+      tags.push({ id: tags.length + 1, text: action.tag });
+      return Object.assign({}, state, { selectedFile: state.selectedFile });
+    case DELETE_TAG:
+      tags = state.selectedFile.tags;
+      tags.splice(action.index, 1);
+      _.forEach(_.range(action.index, tags.length), (index) =>
+        tags[index].id = index + 1
+      )
+      return Object.assign({}, state, { selectedFile: state.selectedFile });
     default:
+      console.log("default reducer:", action.type)
       return state;
   }
 }

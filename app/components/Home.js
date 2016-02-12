@@ -29,13 +29,12 @@ export default class Home extends Component {
   };
 
   render() {
-    const { changeDir, sortByName, updateFav, showDetail, updateAttrs } = this.props
-    const { dirPath, files, selectedIndex } = this.props.home
+    const { changeDir, sortByName, updateFav, showDetail, saveAttrs, updateName, addTag, deleteTag } = this.props
+    const { dirPath, files, selectedFile } = this.props.home
 
     let detail = null;
-    if (selectedIndex >= 0) {
-      let file = files[selectedIndex]
-      detail = <Detail file={file} tags={_.clone(file.tags)} updater={updateAttrs} />
+    if (selectedFile) {
+      detail = <Detail file={selectedFile} updater={saveAttrs} updateName={updateName} addTag={addTag} deleteTag={deleteTag} />
     }
 
     return (

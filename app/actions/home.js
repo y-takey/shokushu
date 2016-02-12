@@ -5,7 +5,10 @@ export const CHANGE_DIR = 'CHANGE_DIR';
 export const SORT_BY_NAME = 'SORT_BY_NAME';
 export const SHOW_DETAIL = 'SHOW_DETAIL';
 export const UPDATE_FAV = 'UPDATE_FAV';
-export const UPDATE_ATTRS = 'UPDATE_ATTRS';
+export const SAVE_ATTRS = 'SAVE_ATTRS';
+export const UPDATE_NAME = 'UPDATE_NAME';
+export const ADD_TAG = 'ADD_TAG';
+export const DELETE_TAG = 'DELETE_TAG';
 
 const HEADER_COL_NAME = 2
 const HEADER_COL_FAV = 3
@@ -47,12 +50,29 @@ export function updateFav(name, fav) {
   }
 }
 
-export function updateAttrs(name, attrs) {
-  console.log("[updateAttrs] arg:", arguments)
-  // debugger
-  // let colName = SORT_COL[col] || "name";
+export function saveAttrs(name, attrs) {
   return {
-    type: UPDATE_ATTRS,
-    file: { name: name, attrs: attrs }
+    type: SAVE_ATTRS
+  }
+}
+
+export function updateName(event) {
+  return {
+    type: UPDATE_NAME,
+    name: event.target.value
+  }
+}
+
+export function addTag(tag) {
+  return {
+    type: ADD_TAG,
+    tag: tag
+  }
+}
+
+export function deleteTag(i) {
+  return {
+    type: DELETE_TAG,
+    index: i
   }
 }
