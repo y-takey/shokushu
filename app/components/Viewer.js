@@ -43,8 +43,9 @@ class Viewer extends Component {
     this.state = { showBar: true, playing: false }
   }
 
-  componentWillUnMount() {
+  componentWillUnmount() {
     document.removeEventListener('keydown', this.handleKeyDown);
+    clearTimeout(this.hiddenTimer);
   }
 
   onMouseMove() {
