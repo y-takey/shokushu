@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import Card from 'material-ui/lib/card/card';
 import CardActions from 'material-ui/lib/card/card-actions';
 import CardHeader from 'material-ui/lib/card/card-header';
@@ -8,6 +9,7 @@ import CardTitle from 'material-ui/lib/card/card-title';
 import FlatButton from 'material-ui/lib/flat-button';
 import CardText from 'material-ui/lib/card/card-text';
 import FloatingActionButton from 'material-ui/lib/floating-action-button';
+import Slider from 'material-ui/lib/slider';
 import { Link } from 'react-router';
 import styles from './Viewer.module.css';
 
@@ -33,14 +35,27 @@ class Viewer extends Component {
 
   constructor(props, context) {
     super(props, context)
-    this.state = { showBar: true, playing: false }
-    _.bindAll(this, 'onMouseMove', 'hideActionBar', 'stepBackward', 'play', 'stop', 'stepForward', 'handleKeyDown')
+    this.state = { showBar: true, playing: true, duration: 10, currentTime: 0, thumbnail: false, sliderPos: 0 }
+    _.bindAll(this, 'onMouseMove', 'hideActionBar',
+      'stepBackward', 'play', 'stop', 'stepForward',
+      'handleKeyDown', 'handleFocus', 'handleMouseOver',
+      'handleMouseOut', 'handleSlider', 'handleSliderChange', 'createThumbnail')
   }
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown);
+    let track = ReactDOM.findDOMNode(this.refs.slider.refs.track)
+    this.trackLeft = this.refs.slider._getTrackLeft()
+    this.trackWidth = track.clientWidth;
+    this.trackY = track.getBoundingClientRect().top;
     this.hideActionBar();
-    this.state = { showBar: true, playing: false }
+    this.refs.video.addEventListener("loadedmetadata", () => {
+      this.setState({ duration: this.refs.video.duration })
+    });
+    this.refs.video.addEventListener("timeupdate", () => {
+      this.setState({ currentTime: Math.floor(this.refs.video.currentTime) })
+    });
+    this.state = { showBar: true, playing: true, duration: 10, currentTime: 0, thumbnail: false, thumbnailPos: null }
   }
 
   componentWillUnmount() {
@@ -59,28 +74,23 @@ class Viewer extends Component {
     this.hiddenTimer = setTimeout( () => {
       this.setState({showBar: false})
     }, 3000);
-
   }
 
   stepBackward() {
-    console.log("clicked stepBackward now:", this.refs.video.currentTime);
     this.refs.video.currentTime -= STEP
   };
 
   play() {
-    console.log("clicked play");
     this.refs.video.play();
     this.setState({ playing: true })
   };
 
   stop() {
-    console.log("clicked stop");
     this.refs.video.pause();
     this.setState({ playing: false })
   };
 
   stepForward() {
-    console.log("clicked stepForward now:", this.refs.video.currentTime);
     this.refs.video.currentTime += STEP
   };
 
@@ -89,34 +99,92 @@ class Viewer extends Component {
   }
 
   handleKeyDown(e) {
-    console.log("-- key is :", e.keyCode)
     switch (e.keyCode) {
       case Keys.LEFT_ARROW:
         e.preventDefault();
         this.stepBackward();
-        console.log("downed key is LEFT_ARROW");
         return;
       case Keys.RIGHT_ARROW:
         e.preventDefault();
         this.stepForward();
-        console.log("downed key is RIGHT_ARROW");
         return;
       case Keys.UP_ARROW:
         e.preventDefault();
-        console.log("downed key is UP_ARROW");
         return;
       case Keys.DOWN_ARROW:
         e.preventDefault();
-        console.log("downed key is DOWN_ARROW");
         return;
       case Keys.ENTER:
         e.preventDefault();
         this.state.playing ? this.stop() : this.play();
-        console.log("downed key is ENTER");
         return;
-      default:
-        console.log("other key is downed:", e.keyCode)
     }
+  }
+
+  handleFocus(e) {
+    console.log("+++ handleFocus")
+  }
+  handleMouseOver(e) {
+    this.setState({ thumbnail: true })
+  }
+  handleMouseOut(e) {
+    console.log("+++ handleMouseOut")
+    this.setState({ thumbnail: false })
+  }
+  handleSlider(e) {
+    let pos = e.clientX - this.trackLeft
+    if (pos < 0) pos = 0; else if (pos > this.trackWidth) pos = this.trackWidth;
+    let percent = pos / this.trackWidth
+    this.refs.preview.currentTime = this.refs.video.duration * percent
+    this.setState({ thumbnailPos: e.clientX })
+  }
+  handleSliderChange(e, value) {
+    this.refs.video.currentTime = Math.floor(value)
+  }
+
+  mmss(sec) {
+    const pad = (val) => { return ("0" + val).slice(-2); };
+    let ss = sec % 60 || 0;
+    let mm = (sec - ss) / 60 || 0;
+    return (pad(mm) + ":" + pad(ss))
+  }
+
+  createSlider() {
+    return (
+      <div style={ { display: 'inline-block', width: '60%', height: '55px'} } >
+        <Slider
+          ref="slider"
+          max={this.state.duration}
+          value={this.state.currentTime}
+          onChange={this.handleSliderChange}
+          onFocus={this.handleFocus}
+          onMouseOver={this.handleMouseOver}
+          onMouseOut={this.handleMouseOut}
+          onMouseMove={this.handleSlider}
+        />
+      </div>
+    )
+  }
+
+  createThumbnail() {
+    let pos = this.state.thumbnailPos || 0
+    const width = 213;
+    const height = 120;
+    const style = {
+      display: this.state.thumbnail ? 'block' : 'none',
+      width: width + 'px',
+      height: height + 'px',
+      position: 'absolute',
+      left: (pos - width / 2) + 'px',
+      top: (this.trackY - height / 2 - 20) + 'px',
+      zIndex: 1000
+    };
+    let filePath = this.props.dirPath + "/" + this.props.params.filename
+    return (
+      <div style={style}>
+        <video src={filePath} ref="preview" width="213px" height="120px" />
+      </div>
+    )
   }
 
   render() {
@@ -133,8 +201,11 @@ class Viewer extends Component {
         </FloatingActionButton>
       )
     }
+
     return (
       <div onMouseMove={this.onMouseMove}>
+        {this.createThumbnail()}
+
         <div className={styles.backButton}>
           <Link to="/">
             <i className="fa fa-arrow-left fa-3x" />
@@ -147,10 +218,12 @@ class Viewer extends Component {
               btn("step-backward", this.stepBackward),
               (this.state.playing ? btn("stop", this.stop) : btn("play", this.play)),
               btn("step-forward", this.stepForward),
-              btn("expand", this.fullscreen)
+              btn("expand", this.fullscreen),
+              this.createSlider(),
+              <span>{this.mmss(this.state.currentTime)}</span>
             ]}
           >
-            <video controls autoPlay src={filePath} ref="video"></video>
+            <video autoPlay src={filePath} ref="video"></video>
           </CardMedia>
           <CardTitle title={filename} />
           <CardText>
