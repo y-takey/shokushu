@@ -1,6 +1,14 @@
 # shokushu
-Local video player using electron.
-This application based on [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate).
+
+This application is Local video manage and player using electron.
+The application based on [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate).
+
+## Features
+
+1. Keyboard friendly
+1. Tagging and favorites the video
+1. Preview it when mouse hover on seekbar
+1. Mamakita button (means showing emergency evacuation screen)
 
 ## Install
 
@@ -21,26 +29,6 @@ $ npm run start-hot
 ```
 
 *Note: requires a node version >= 4 and an npm version >= 2.*
-
-
-#### Toggle Redux DevTools
-
-- All platforms: <kbd>Ctrl+H</kbd>
-
-*See [redux-devtools-dock-monitor](https://github.com/gaearon/redux-devtools-dock-monitor) for more information.*
-
-
-## Externals
-
-If you use any 3rd party libraries which can't be built with webpack, you must list them in your `webpack.config.base.js`：
-
-```javascript
-externals: [
-  // put your node 3rd party libraries which can't be built with webpack here (mysql, mongodb, and so on..)
-]
-```
-
-You can find those lines in the file.
 
 
 ## CSS Modules support
@@ -71,16 +59,6 @@ $ npm run package-all
 Use `electron-packager` to pack your app with `--all` options for darwin (osx), linux and win32 (windows) platform. After build, you will find them in `release` folder. Otherwise, you will only find one for your os.
 
 `test`, `tools`, `release` folder and devDependencies in `package.json` will be ignored by default.
-
-#### Default Ignore modules
-
-We add some module's `peerDependencies` to ignore option as default for application size reduction.
-
-- `babel-core` is required by `babel-loader` and its size is ~19 MB
-- `node-libs-browser` is required by `webpack` and its size is ~3MB.
-
-> **Note:** If you want to use any above modules in runtime, for example: `require('babel/register')`, you should move them form `devDependencies` to `dependencies`.
-
 
 ## License
 

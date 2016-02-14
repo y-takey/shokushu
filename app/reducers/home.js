@@ -1,21 +1,25 @@
 import fs from 'fs';
 import _ from 'lodash';
+const low = require('lowdb')
+const storage = require('lowdb/file-sync')
+const db = low('db.json', { storage })
+
 import { CHANGE_DIR, SORT_BY_NAME, SHOW_DETAIL, UPDATE_FAV, SAVE_ATTRS, UPDATE_NAME, ADD_TAG, DELETE_TAG } from '../actions/home';
 
 const fileTmpl = { name: "", fav: 0, tags: [], registered_at: "" };
 
-function saveFiles(files) {
-  localStorage.setItem("files", JSON.stringify(files));
+function getConfig(key) {
+  let rec = db("config").find({ key: key })
+  if (!rec) {
+    rec = { key: key, value: "" }
+    db("config").push(rec)
+  }
+  return rec.value
 }
 
-function loadFiles() {
-  let files = localStorage.getItem("files");
-  if (files) {
-    files = JSON.parse(files);
-  } else {
-    files = [];
-  }
-  return _(files);
+function setConfig(key, value) {
+  let rec = db("config").chain().find({ key: key })
+  rec.assign({ value: value }).value()
 }
 
 function dateFormat(date) {
@@ -33,17 +37,16 @@ function getFiles(dirPath) {
     return [];
   }
 
-  let master = loadFiles();
   let files = [];
   fs.readdirSync(dirPath).map((filename)=> {
-    let obj = master.find({ name: filename});
+    let obj = db("files").find({ name: filename});
     if (!obj) {
       let stats = fs.statSync(dirPath + "/" + filename);
       obj = { name: filename, registered_at: dateFormat(stats.birthtime) }
+      db("files").push(Object.assign(_.cloneDeep(fileTmpl), obj))
     }
-    files.push(Object.assign(_.cloneDeep(fileTmpl), obj))
   })
-  return files;
+  return db("files");
 }
 
 function sortBy(state, colName) {
@@ -56,27 +59,22 @@ function sortBy(state, colName) {
 }
 
 function updateFav(state, file) {
-  let idx = _.findIndex(state.files, { name: file.name })
-  state.files[idx].fav = file.fav
-  saveFiles(state.files)
-  return { files: state.files };
+  db("files").chain().find({ name: file.name }).assign({ fav: file.fav }).value()
+  return { files: db("files") };
 }
 
 function saveAttrs(state) {
   let file = state.selectedFile
-  let idx = _.findIndex(state.files, { name: file.originName });
-  let origin = state.files[idx];
+  let origin = db("files").chain().find({ name: file.originName });
   if (origin.name !== file.name) {
     fs.renameSync(state.dirPath + "/" + origin.name, state.dirPath + "/" + file.name);
   }
-  Object.assign(origin, file);
-  delete origin.originName
-  saveFiles(state.files);
-  return { files: state.files };
+  origin.assign({ name: file.name, tags: file.tags }).value()
+  return { files: db("files") };
 }
 
 // file entity is: name, registered_at
-let dirPath = localStorage.getItem("dirPath");
+let dirPath = getConfig("dirPath");
 const initialState = {
   dirPath: dirPath,
   files: getFiles(dirPath),
@@ -90,7 +88,7 @@ export default function home(state = initialState, action) {
   switch (action.type) {
     case CHANGE_DIR:
       newPropeties = { dirPath: action.dirPath, files: getFiles(action.dirPath) }
-      localStorage.setItem("dirPath", action.dirPath)
+      setConfig("dirPath", action.dirPath)
       let newState = Object.assign({}, state, newPropeties);
 
       return newState;

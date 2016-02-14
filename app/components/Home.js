@@ -24,7 +24,7 @@ export default class Home extends Component {
     deselectOnClickaway: true,
     height: '400px',
     columnStyle: {
-      width: '50px'
+      width: '10px'
     }
   };
 
@@ -39,7 +39,7 @@ export default class Home extends Component {
 
     return (
       <div>
-      ディレクトリ:{dirPath}  <RaisedButton label="変更" secondary={true} onClick={changeDir} />
+      Dir:  {dirPath}  <RaisedButton label="変更" secondary={true} onClick={changeDir} />
       <Table
         height={Home.tableSettings.height}
         fixedHeader={Home.tableSettings.fixedHeader}
@@ -49,7 +49,7 @@ export default class Home extends Component {
       >
         <TableHeader displaySelectAll={false} adjustForCheckbox={false} enableSelectAll={Home.tableSettings.enableSelectAll}>
           <TableRow onCellClick={sortByName}>
-            <TableHeaderColumn style={Home.tableSettings.columnStyle}>ID</TableHeaderColumn>
+            <TableHeaderColumn style={Home.tableSettings.columnStyle}></TableHeaderColumn>
             <TableHeaderColumn>Name</TableHeaderColumn>
             <TableHeaderColumn>Fav</TableHeaderColumn>
             <TableHeaderColumn>registered at</TableHeaderColumn>
