@@ -16,6 +16,7 @@ import styles from './Viewer.module.css';
 // Constants
 const Keys = {
   ENTER: 13,
+  ESCAPE: 27,
   LEFT_ARROW: 37,
   UP_ARROW: 38,
   RIGHT_ARROW: 39,
@@ -35,7 +36,7 @@ class Viewer extends Component {
 
   constructor(props, context) {
     super(props, context)
-    this.state = { showBar: true, playing: true, duration: 10, currentTime: 0, thumbnail: false, sliderPos: 0 }
+    this.state = { showBar: true, playing: true, duration: 10, currentTime: 0, thumbnail: false, sliderPos: 0, fullscreen: false }
     _.bindAll(this, 'onMouseMove', 'hideActionBar',
       'stepBackward', 'play', 'stop', 'stepForward',
       'handleKeyDown', 'handleFocus', 'handleMouseOver',
@@ -44,6 +45,7 @@ class Viewer extends Component {
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown);
+    this.videoContainer = ReactDOM.findDOMNode(this.refs.videocard)
     let track = ReactDOM.findDOMNode(this.refs.slider.refs.track)
     this.trackLeft = this.refs.slider._getTrackLeft()
     this.trackWidth = track.clientWidth;
@@ -55,7 +57,7 @@ class Viewer extends Component {
     this.refs.video.addEventListener("timeupdate", () => {
       this.setState({ currentTime: Math.floor(this.refs.video.currentTime) })
     });
-    this.state = { showBar: true, playing: true, duration: 10, currentTime: 0, thumbnail: false, thumbnailPos: null }
+    this.state = { showBar: true, playing: true, duration: 10, currentTime: 0, thumbnail: false, thumbnailPos: null, fullscreen: false }
   }
 
   componentWillUnmount() {
@@ -95,7 +97,12 @@ class Viewer extends Component {
   };
 
   fullscreen() {
-    this.refs.video.webkitRequestFullscreen();
+    this.videoContainer.webkitRequestFullscreen();
+    this.setState({ fullscreen: true })
+  }
+  exitFullscreen() {
+    document.webkitExitFullscreen();
+    this.setState({ fullscreen: false })
   }
 
   handleKeyDown(e) {
@@ -118,6 +125,10 @@ class Viewer extends Component {
         e.preventDefault();
         this.state.playing ? this.stop() : this.play();
         return;
+      case Keys.ESCAPE:
+        e.preventDefault();
+        this.exitFullscreen();
+        return;
     }
   }
 
@@ -128,7 +139,6 @@ class Viewer extends Component {
     this.setState({ thumbnail: true })
   }
   handleMouseOut(e) {
-    console.log("+++ handleMouseOut")
     this.setState({ thumbnail: false })
   }
   handleSlider(e) {
@@ -213,12 +223,13 @@ class Viewer extends Component {
         </div>
 
         <Card>
-          <CardMedia overlayStyle={ { display: (this.state.showBar ? 'block' : 'none') } }
+          <CardMedia ref="videocard" style={ this.state.fullscreen ? { width: screen.width } : {} }
+            overlayStyle={ { display: (this.state.showBar ? 'block' : 'none') } }
             overlay={[
               btn("step-backward", this.stepBackward),
               (this.state.playing ? btn("stop", this.stop) : btn("play", this.play)),
               btn("step-forward", this.stepForward),
-              btn("expand", this.fullscreen),
+              (this.state.fullscreen ? btn("compress", this.exitFullscreen) : btn("expand", this.fullscreen)),
               this.createSlider(),
               <span>{this.mmss(this.state.currentTime)}</span>
             ]}
