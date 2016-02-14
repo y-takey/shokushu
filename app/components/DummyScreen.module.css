@@ -1,0 +1,29 @@
+html, body {
+  height: 100%;
+}
+.main {
+  padding: 3px;
+}
+
+.command {
+  color: #98c379;
+}
+
+.place {
+  color: #d19a66;
+}
+
+.prompt {
+  color: #e06c75;
+}
+
+.cli {
+  background-color: #282c34;
+  border: none;
+  color: #abb2bf;
+  font-size: 15px;
+  font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+}
+.cli:focus {
+  outline: none;
+}

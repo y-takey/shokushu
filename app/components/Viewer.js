@@ -12,6 +12,7 @@ import FloatingActionButton from 'material-ui/lib/floating-action-button';
 import Slider from 'material-ui/lib/slider';
 import { Link } from 'react-router';
 import styles from './Viewer.module.css';
+import DummyScreen from './DummyScreen';
 
 // Constants
 const Keys = {
@@ -104,8 +105,20 @@ class Viewer extends Component {
     document.webkitExitFullscreen();
     this.setState({ fullscreen: false })
   }
+  evacuate() {
+    if (this.state.evacuate) {
+      this.setState({ evacuate: false })
+    } else {
+      this.stop()
+      this.exitFullscreen();
+      this.setState({ evacuate: true })
+    }
+  }
 
   handleKeyDown(e) {
+    if (this.state.evacuate && e.keyCode !== Keys.SPACE) {
+      return;
+    }
     switch (e.keyCode) {
       case Keys.LEFT_ARROW:
         e.preventDefault();
@@ -128,6 +141,10 @@ class Viewer extends Component {
       case Keys.ESCAPE:
         e.preventDefault();
         this.exitFullscreen();
+        return;
+      case Keys.SPACE:
+        e.preventDefault();
+        this.evacuate();
         return;
     }
   }
@@ -211,37 +228,44 @@ class Viewer extends Component {
         </FloatingActionButton>
       )
     }
+    let dummyScreen = null;
+    if (this.state.evacuate) {
+      dummyScreen = <DummyScreen />
+    }
 
     return (
-      <div onMouseMove={this.onMouseMove}>
-        {this.createThumbnail()}
+      <div>
+        {dummyScreen}
+        <div onMouseMove={this.onMouseMove} style={ {display: this.state.evacuate ? 'none' : 'block' } }>
+          {this.createThumbnail()}
 
-        <div className={styles.backButton}>
-          <Link to="/">
-            <i className="fa fa-arrow-left fa-3x" />
-          </Link>
+          <div className={styles.backButton}>
+            <Link to="/">
+              <i className="fa fa-arrow-left fa-3x" />
+            </Link>
+          </div>
+
+          <Card>
+            <CardMedia ref="videocard" style={ this.state.fullscreen ? { width: screen.width } : {} }
+              overlayStyle={ { display: (this.state.showBar ? 'block' : 'none') } }
+              overlay={[
+                btn("step-backward", this.stepBackward),
+                (this.state.playing ? btn("stop", this.stop) : btn("play", this.play)),
+                btn("step-forward", this.stepForward),
+                (this.state.fullscreen ? btn("compress", this.exitFullscreen) : btn("expand", this.fullscreen)),
+                this.createSlider(),
+                <span>{this.mmss(this.state.currentTime)}</span>
+              ]}
+            >
+              <video autoPlay src={filePath} ref="video"></video>
+            </CardMedia>
+            <CardTitle title={filename} />
+            <CardText>
+              tags...
+            </CardText>
+          </Card>
+
         </div>
-
-        <Card>
-          <CardMedia ref="videocard" style={ this.state.fullscreen ? { width: screen.width } : {} }
-            overlayStyle={ { display: (this.state.showBar ? 'block' : 'none') } }
-            overlay={[
-              btn("step-backward", this.stepBackward),
-              (this.state.playing ? btn("stop", this.stop) : btn("play", this.play)),
-              btn("step-forward", this.stepForward),
-              (this.state.fullscreen ? btn("compress", this.exitFullscreen) : btn("expand", this.fullscreen)),
-              this.createSlider(),
-              <span>{this.mmss(this.state.currentTime)}</span>
-            ]}
-          >
-            <video autoPlay src={filePath} ref="video"></video>
-          </CardMedia>
-          <CardTitle title={filename} />
-          <CardText>
-            tags...
-          </CardText>
-        </Card>
-
       </div>
     );
   }
