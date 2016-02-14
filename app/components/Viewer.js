@@ -74,7 +74,7 @@ class Viewer extends Component {
   hideActionBar() {
     clearTimeout(this.hiddenTimer);
     this.hiddenTimer = setTimeout( () => {
-      this.setState({showBar: false})
+      this.setState({ showBar: false, thumbnail: false })
     }, 3000);
   }
 
@@ -144,7 +144,7 @@ class Viewer extends Component {
   handleSlider(e) {
     let pos = e.clientX - this.trackLeft
     if (pos < 0) pos = 0; else if (pos > this.trackWidth) pos = this.trackWidth;
-    let percent = pos / this.trackWidth
+    let percent = Math.round(pos * 100 / this.trackWidth) / 100
     this.refs.preview.currentTime = this.refs.video.duration * percent
     this.setState({ thumbnailPos: e.clientX })
   }
