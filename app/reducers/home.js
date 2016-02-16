@@ -1,26 +1,10 @@
 import fs from 'fs';
 import _ from 'lodash';
-const low = require('lowdb')
-const storage = require('lowdb/file-sync')
-const db = low('db.json', { storage })
+import * as Config from '../models/config'
+import * as Video from '../models/video'
 
-import { CHANGE_DIR, SORT_BY_NAME, SHOW_DETAIL, UPDATE_FAV, SAVE_ATTRS, UPDATE_NAME, ADD_TAG, DELETE_TAG } from '../actions/home';
-
-const fileTmpl = { name: "", fav: 0, tags: [], registered_at: "" };
-
-function getConfig(key) {
-  let rec = db("config").find({ key: key })
-  if (!rec) {
-    rec = { key: key, value: "" }
-    db("config").push(rec)
-  }
-  return rec.value
-}
-
-function setConfig(key, value) {
-  let rec = db("config").chain().find({ key: key })
-  rec.assign({ value: value }).value()
-}
+import { CHANGE_DIR, FILTER_TAG, SORT_BY_NAME, SHOW_DETAIL,
+  UPDATE_FAV, SAVE_ATTRS, UPDATE_NAME, ADD_TAG, DELETE_TAG } from '../actions/home';
 
 function dateFormat(date) {
   const pad = (val) => { return ("0" + val).slice(-2); }
@@ -32,96 +16,128 @@ function dateFormat(date) {
   ].join('/')
 }
 
-function getFiles(dirPath) {
+function getFiles() {
+  let dirPath = Config.get("dirPath")
   if (!dirPath) {
-    return [];
+    return _([]);
   }
 
-  let files = [];
   fs.readdirSync(dirPath).map((filename)=> {
-    let obj = db("files").find({ name: filename});
+    let obj = Video.find({ name: filename});
     if (!obj) {
       let stats = fs.statSync(dirPath + "/" + filename);
       obj = { name: filename, registered_at: dateFormat(stats.birthtime) }
-      db("files").push(Object.assign(_.cloneDeep(fileTmpl), obj))
+      Video.insert(obj)
     }
   })
-  return db("files");
+  return Video.all();
 }
 
-function sortBy(state, colName) {
+function changeDir(state, action) {
+  Config.set("dirPath", action.dirPath)
+  return { dirPath: action.dirPath, files: getFiles() }
+}
+
+function filterTag(state, action) {
+  let tag, files;
+
+  if (state.tag === action.tag) {
+    tag = undefined;
+    files = Video.all();
+  } else {
+    tag = action.tag
+    files = Video.filterByTag(tag)
+  }
+  return { tag: tag, files: files }
+}
+
+function sortBy(state, action) {
+  let colName = action.colName
   let sorter = { colName: colName, order: "asc" };
   if (state.sorter.colName == colName && state.sorter.order == "asc") {
     sorter.order = "desc";
   }
-  let files = _.orderBy(state.files, [colName], [sorter.order]);
-  return { sorter: sorter, files: files };
+  let files = state.files.chain().orderBy([colName], [sorter.order]);
+  return { sorter: sorter, files: files, selectedFile: undefined };
 }
 
-function updateFav(state, file) {
-  db("files").chain().find({ name: file.name }).assign({ fav: file.fav }).value()
-  return { files: db("files") };
+function showDetail(state, action) {
+  let file = _.cloneDeep(state.files.get(action.row));
+  file.originName = file.name;
+  return { selectedFile: file };
 }
 
-function saveAttrs(state) {
-  let file = state.selectedFile
-  let origin = db("files").chain().find({ name: file.originName });
-  if (origin.name !== file.name) {
-    fs.renameSync(state.dirPath + "/" + origin.name, state.dirPath + "/" + file.name);
+function updateFav(state, action) {
+  Video.update({ name: action.file.name }, action.file);
+  return { files: Video.all() };
+}
+
+function saveAttrs(state, atcion) {
+  let video = state.selectedFile
+  if (video.originName !== video.name) {
+    fs.renameSync(state.dirPath + "/" + video.originName, state.dirPath + "/" + video.name);
   }
-  origin.assign({ name: file.name, tags: file.tags }).value()
-  return { files: db("files") };
+  Video.update({ name: video.originName }, video);
+  return { files: Video.all(), tags: refreshTags() };
 }
 
-// file entity is: name, registered_at
-let dirPath = getConfig("dirPath");
+function refreshTags() {
+  let tags = Video.all().transform( (result, video)=> {
+    _.each(video.tags, (tag)=> {
+      result[tag.text] = result[tag.text] || 0;
+      result[tag.text]++;
+    })
+  }, {})
+  Config.set("tags", tags);
+  return tags;
+}
+
+function updateName(state, action) {
+  state.selectedFile.name = action.name
+  return { selectedFile: state.selectedFile };
+}
+
+function addTag(state, action) {
+  let tags = state.selectedFile.tags;
+  tags.push({ id: tags.length + 1, text: action.tag });
+  return { selectedFile: state.selectedFile };
+}
+
+function deleteTag(state, action) {
+  let tags = state.selectedFile.tags;
+  tags.splice(action.index, 1);
+  _.forEach(_.range(action.index, tags.length), (index) =>
+    tags[index].id = index + 1
+  )
+  return { selectedFile: state.selectedFile };
+}
+
 const initialState = {
-  dirPath: dirPath,
-  files: getFiles(dirPath),
+  dirPath: Config.get("dirPath"),
+  files: getFiles(),
   sorter: { colName: "name", order: "asc" },
-  tags: []
+  tags: Config.get("tags") || []
+}
+
+const dispatcher = {
+  [CHANGE_DIR]: changeDir,
+  [FILTER_TAG]: filterTag,
+  [SORT_BY_NAME]: sortBy,
+  [SHOW_DETAIL]: showDetail,
+  [UPDATE_FAV]: updateFav,
+  [SAVE_ATTRS]: saveAttrs,
+  [UPDATE_NAME]: updateName,
+  [ADD_TAG]: addTag,
+  [DELETE_TAG]: deleteTag
 }
 
 export default function home(state = initialState, action) {
-  let newPropeties
-  let tags
-  switch (action.type) {
-    case CHANGE_DIR:
-      newPropeties = { dirPath: action.dirPath, files: getFiles(action.dirPath) }
-      setConfig("dirPath", action.dirPath)
-      let newState = Object.assign({}, state, newPropeties);
-
-      return newState;
-    case SORT_BY_NAME:
-      newPropeties = sortBy(state, action.colName)
-      newPropeties.selectedIndex = undefined;
-      return Object.assign({}, state, newPropeties);
-    case SHOW_DETAIL:
-      let file = _.cloneDeep(state.files[action.row])
-      file.originName = file.name
-      return Object.assign({}, state, { selectedFile: file });
-    case UPDATE_FAV:
-      newPropeties = updateFav(state, action.file)
-      return Object.assign({}, state, newPropeties);
-    case SAVE_ATTRS:
-      newPropeties = saveAttrs(state)
-      return Object.assign({}, state, newPropeties);
-    case UPDATE_NAME:
-      state.selectedFile.name = action.name
-      return Object.assign({}, state, { selectedFile: state.selectedFile });
-    case ADD_TAG:
-      tags = state.selectedFile.tags;
-      tags.push({ id: tags.length + 1, text: action.tag });
-      return Object.assign({}, state, { selectedFile: state.selectedFile });
-    case DELETE_TAG:
-      tags = state.selectedFile.tags;
-      tags.splice(action.index, 1);
-      _.forEach(_.range(action.index, tags.length), (index) =>
-        tags[index].id = index + 1
-      )
-      return Object.assign({}, state, { selectedFile: state.selectedFile });
-    default:
-      console.log("default reducer:", action.type)
-      return state;
+  let proc = dispatcher[action.type];
+  if (!proc) {
+    console.log("default reducer:", action.type)
+    return state;
   }
+
+  let newProp = proc(state, action);
+  return Object.assign({}, state, newProp);
 }

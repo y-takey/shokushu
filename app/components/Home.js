@@ -2,14 +2,22 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 import RaisedButton from 'material-ui/lib/raised-button';
+import TextField from 'material-ui/lib/text-field';
 import Table from 'material-ui/lib/table/table';
 import TableHeader from 'material-ui/lib/table/table-header';
 import TableHeaderColumn from 'material-ui/lib/table/table-header-column';
 import TableRow from 'material-ui/lib/table/table-row';
 import TableBody from 'material-ui/lib/table/table-body';
+import LeftNav from 'material-ui/lib/left-nav';
 import styles from './Home.module.css';
 import Item from './Item';
+import TagLabels from './TagLabels';
 import Detail from './Detail';
+
+import ThemeManager from 'material-ui/lib/styles/theme-manager';
+const CustomTheme = {
+  fontFamily: "Menlo, Consolas, 'DejaVu Sans Mono', monospace"
+}
 
 export default class Home extends Component {
 
@@ -28,18 +36,41 @@ export default class Home extends Component {
     }
   };
 
+  static get childContextTypes() {
+    return { muiTheme: React.PropTypes.object };
+  }
+
+  getChildContext() {
+    return {
+      muiTheme: ThemeManager.getMuiTheme(CustomTheme)
+    }
+  }
+
   render() {
-    const { changeDir, sortByName, updateFav, showDetail, saveAttrs, updateName, addTag, deleteTag } = this.props
-    const { dirPath, files, selectedFile } = this.props.home
+    const { changeDir, filterTag, sortByName, updateFav, showDetail, saveAttrs, updateName, addTag, deleteTag } = this.props
+    const { dirPath, tag, files, selectedFile, tags } = this.props.home
 
     let detail = null;
     if (selectedFile) {
-      detail = <Detail file={selectedFile} updater={saveAttrs} updateName={updateName} addTag={addTag} deleteTag={deleteTag} />
+      detail = <Detail
+        file={selectedFile}
+        tags={tags}
+        updater={saveAttrs}
+        updateName={updateName}
+        addTag={addTag}
+        deleteTag={deleteTag}
+      />
     }
 
     return (
-      <div>
-      Dir:  {dirPath}  <RaisedButton label="変更" secondary={true} onClick={changeDir} />
+      <div style={ { paddingLeft: 150 } } >
+      <RaisedButton label="change" secondary={true} onClick={changeDir} />&nbsp;
+      <TextField value={dirPath} disabled={true} style={ { width: '80%' } } inputStyle={ { color: "#424242" } } />
+
+      <LeftNav open={true} width={150}>
+        <TagLabels tags={_.keys(tags)} activeTag={tag} handler={filterTag} />
+      </LeftNav>
+
       <Table
         height={Home.tableSettings.height}
         fixedHeader={Home.tableSettings.fixedHeader}
@@ -60,7 +91,7 @@ export default class Home extends Component {
           showRowHover={Home.tableSettings.showRowHover}
           stripedRows={Home.tableSettings.stripedRows}
         >
-          {files.map( (file, index) => {
+          {files.value().map( (file, index) => {
             return <Item key={file.name} file={file} index={index} columnStyle={Home.tableSettings.columnStyle} updater={updateFav} shower={showDetail}/>;
           })}
         </TableBody>

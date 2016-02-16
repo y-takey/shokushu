@@ -2,6 +2,7 @@ const remote = require('remote');
 const dialog = remote.require('dialog');
 
 export const CHANGE_DIR = 'CHANGE_DIR';
+export const FILTER_TAG = 'FILTER_TAG';
 export const SORT_BY_NAME = 'SORT_BY_NAME';
 export const SHOW_DETAIL = 'SHOW_DETAIL';
 export const UPDATE_FAV = 'UPDATE_FAV';
@@ -25,6 +26,13 @@ export function changeDir() {
   return {
     type: CHANGE_DIR,
     dirPath: dirPaths[0]
+  };
+}
+
+export function filterTag(tag) {
+  return {
+    type: FILTER_TAG,
+    tag: tag
   };
 }
 

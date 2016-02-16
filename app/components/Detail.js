@@ -14,34 +14,46 @@ const style = {
   marginRight: 20,
 };
 
-const suggestions = ["hoge", "fuga", "foo"];
-
 export default class Detail extends Component {
   constructor(props, context) {
     super(props, context)
-    _.bindAll(this, "showAllSuggestions", "handleAddition")
+    _.bindAll(this, "handleTagKeyDown", "suggestions")
   }
 
   handleDrag(tag, currPos, newPos) {
     // dummy
   }
-  showAllSuggestions() {
-    this.refs.tag.refs.child.setState({
+
+  handleTagKeyDown(e) {
+    let tagComponent = this.refs.tag.refs.child;
+    if (e.keyCode !== 40 || tagComponent.state.query) {
+      return;
+    }
+    // show all suggestions
+    tagComponent.setState({
       selectionMode: true,
-      suggestions: suggestions,
+      selectedIndex: -1,
+      suggestions: this.suggestions(),
       query: "&nbsp;"
     })
   }
-  componentDidMount() {
-    let input = ReactDOM.findDOMNode(this.refs.tag).getElementsByTagName("input")[0];
 
-    input.addEventListener('focus', this.showAllSuggestions);
-    _.defer(() => { input.blur(); input.focus() });
+  componentDidMount() {
+    let input = this.refs.tag.refs.child.refs.input;
+    input.addEventListener('keydown', this.handleTagKeyDown);
   }
-  handleAddition(tag) {
-    this.props.addTag(tag);
-    _.delay(this.showAllSuggestions, 300);
+
+  suggestions() {
+    let selecteds = _(this.props.file.tags)
+    let sug = _.chain(this.props.tags).
+      map( (value, tag)=> {
+        return tag;
+      }).reject( (tag)=> {
+        return selecteds.find({ text: tag });
+      })
+    return sug.value();
   }
+
   render() {
     const { file, updater, updateName, addTag, deleteTag } = this.props;
     return (
@@ -50,9 +62,9 @@ export default class Detail extends Component {
           <CardText>
             <TextField ref="name" value={file.name} onChange={updateName}/>
             <ReactTags ref="tag" tags={file.tags}
-                    suggestions={suggestions}
+                    suggestions={this.suggestions()}
                     handleDelete={deleteTag}
-                    handleAddition={this.handleAddition}
+                    handleAddition={addTag}
                     handleDrag={this.handleDrag}
                     autofocus={true}
                     minQueryLength={1}
