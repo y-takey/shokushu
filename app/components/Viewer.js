@@ -10,8 +10,12 @@ import FlatButton from 'material-ui/lib/flat-button';
 import CardText from 'material-ui/lib/card/card-text';
 import FloatingActionButton from 'material-ui/lib/floating-action-button';
 import Slider from 'material-ui/lib/slider';
+import List from 'material-ui/lib/lists/list';
+import ListItem from 'material-ui/lib/lists/list-item';
+import Avatar from 'material-ui/lib/avatar';
 import { Link } from 'react-router';
 import styles from './Viewer.module.css';
+import TagLabels from './TagLabels';
 import DummyScreen from './DummyScreen';
 
 // Constants
@@ -22,18 +26,13 @@ const Keys = {
   UP_ARROW: 38,
   RIGHT_ARROW: 39,
   DOWN_ARROW: 40,
-  SPACE: 32
+  SPACE: 32,
+  B: 66
 };
 
 const STEP = 10;
 
 class Viewer extends Component {
-  static propTypes = {
-    increment: PropTypes.func.isRequired,
-    incrementIfOdd: PropTypes.func.isRequired,
-    incrementAsync: PropTypes.func.isRequired,
-    decrement: PropTypes.func.isRequired
-  };
 
   constructor(props, context) {
     super(props, context)
@@ -41,7 +40,9 @@ class Viewer extends Component {
     _.bindAll(this, 'onMouseMove', 'hideActionBar',
       'stepBackward', 'play', 'stop', 'stepForward',
       'handleKeyDown', 'handleFocus', 'handleMouseOver',
-      'handleMouseOut', 'handleSlider', 'handleSliderChange', 'createThumbnail')
+      'handleMouseOut', 'handleSlider', 'handleSliderChange', 'createThumbnail',
+      'goBookmark'
+    )
   }
 
   componentDidMount() {
@@ -58,7 +59,16 @@ class Viewer extends Component {
     this.refs.video.addEventListener("timeupdate", () => {
       this.setState({ currentTime: Math.floor(this.refs.video.currentTime) })
     });
-    this.state = { showBar: true, playing: true, duration: 10, currentTime: 0, thumbnail: false, thumbnailPos: null, fullscreen: false }
+    this.state = {
+      file: this.props.location.state.file,
+      howBar: true,
+      playing: true,
+      duration: 10,
+      currentTime: 0,
+      thumbnail: false,
+      thumbnailPos: null,
+      fullscreen: false
+    }
   }
 
   componentWillUnmount() {
@@ -119,34 +129,23 @@ class Viewer extends Component {
     if (this.state.evacuate && e.keyCode !== Keys.SPACE) {
       return;
     }
-    switch (e.keyCode) {
-      case Keys.LEFT_ARROW:
-        e.preventDefault();
-        this.stepBackward();
-        return;
-      case Keys.RIGHT_ARROW:
-        e.preventDefault();
-        this.stepForward();
-        return;
-      case Keys.UP_ARROW:
-        e.preventDefault();
-        return;
-      case Keys.DOWN_ARROW:
-        e.preventDefault();
-        return;
-      case Keys.ENTER:
-        e.preventDefault();
-        this.state.playing ? this.stop() : this.play();
-        return;
-      case Keys.ESCAPE:
-        e.preventDefault();
-        this.exitFullscreen();
-        return;
-      case Keys.SPACE:
-        e.preventDefault();
-        this.evacuate();
-        return;
+    const eventDispatcher = {
+      [Keys.LEFT_ARROW]:  () => this.stepBackward(),
+      [Keys.RIGHT_ARROW]: () => this.stepForward(),
+      [Keys.UP_ARROW]:    () => this.stepForward(),
+      [Keys.DOWN_ARROW]:  () => this.stepForward(),
+      [Keys.ENTER]:       () => this.state.playing ? this.stop() : this.play(),
+      [Keys.ESCAPE]:      () => this.exitFullscreen(),
+      [Keys.SPACE]:       () => this.evacuate(),
+      [Keys.B]:           () => this.handleAddBookmark()
     }
+
+    let dispatcher = eventDispatcher[e.keyCode]
+
+    if (!dispatcher) { return; }
+
+    e.preventDefault();
+    dispatcher();
   }
 
   handleFocus(e) {
@@ -167,6 +166,14 @@ class Viewer extends Component {
   }
   handleSliderChange(e, value) {
     this.refs.video.currentTime = Math.floor(value)
+  }
+
+  handleAddBookmark(e) {
+    this.props.addBookmark(this.state.file, this.refs.video.currentTime)
+  }
+
+  goBookmark(bookmark) {
+    this.refs.video.currentTime = bookmark
   }
 
   mmss(sec) {
@@ -218,7 +225,9 @@ class Viewer extends Component {
     const style = {
       marginRight: 20,
     };
-
+    let file = this.props.location.state.file
+    let tags = _.map(file.tags, "text");
+    let bookmarks = file.bookmarks || []
     let filename = this.props.params.filename
     let filePath = this.props.dirPath + "/" + filename
     let btn = (icon, handler) => {
@@ -261,10 +270,22 @@ class Viewer extends Component {
             </CardMedia>
             <CardTitle title={filename} />
             <CardText>
-              tags...
+              <TagLabels tags={tags} />
+              <List subheader="Bookmarks" insetSubheader={true} style={ { width: 300 } }>
+                {bookmarks.map( (bookmark) => {
+                  return(
+                    <ListItem
+                      key={bookmark}
+                      leftAvatar={<Avatar icon={<i className="fa fa-bookmark" />} />}
+                      rightIcon={<i className="fa fa-remove" />}
+                      primaryText={this.mmss(bookmark)}
+                      onClick={ () => this.goBookmark(bookmark) }
+                    />
+                  )
+                })}
+              </List>
             </CardText>
           </Card>
-
         </div>
       </div>
     );

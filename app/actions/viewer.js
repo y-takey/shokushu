@@ -1,34 +1,17 @@
-export const INCREMENT_COUNTER = 'INCREMENT_COUNTER';
-export const DECREMENT_COUNTER = 'DECREMENT_COUNTER';
+export const ADD_BOOKMARK = 'ADD_BOOKMARK';
+export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
 
-export function increment() {
+export function addBookmark(file, time) {
   return {
-    type: INCREMENT_COUNTER
+    type: ADD_BOOKMARK,
+    file: file,
+    time: Math.round(time)
   };
 }
 
-export function decrement() {
+export function removeBookmark() {
   return {
-    type: DECREMENT_COUNTER
-  };
-}
-
-export function incrementIfOdd() {
-  return (dispatch, getState) => {
-    const { counter } = getState();
-
-    if (counter % 2 === 0) {
-      return;
-    }
-
-    dispatch(increment());
-  };
-}
-
-export function incrementAsync(delay = 1000) {
-  return dispatch => {
-    setTimeout(() => {
-      dispatch(increment());
-    }, delay);
+    type: REMOVE_BOOKMARK,
+    index: 1
   };
 }

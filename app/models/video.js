@@ -28,7 +28,7 @@ function insert(entity) {
 }
 
 function update(condition, attrs) {
-  let updatables = _.pick(attrs, ['name', 'fav', 'tags'])
+  let updatables = _.pick(attrs, ['name', 'fav', 'tags', 'bookmarks'])
   return db(TABLE).chain().find(condition).
     assign(updatables).value()
 }

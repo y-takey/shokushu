@@ -30,7 +30,7 @@ export default class Item extends Component {
       <TableRow key={index} onCellClick={ (e) => this.props.shower(index) }>
         <TableRowColumn style={this.props.columnStyle}>{index + 1}</TableRowColumn>
         <TableRowColumn>
-          <Link to={`/viewer/${file.name}`} style={ { fontSize: 16 } }>{file.name}</Link>
+          <Link to={`/viewer/${file.name}`} state={ { file: file } } style={ { fontSize: 16 } }>{file.name}</Link>
           <TagLabels tags={tags} />
         </TableRowColumn>
         <TableRowColumn>
