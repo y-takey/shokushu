@@ -9,7 +9,7 @@ export default class TagLabels extends Component {
       <div>
         {_.map(tags, (t) => {
           let active = activeTag === t ? " active" : ""
-          return <span className={`tag-label${active}`} key={t} onClick={ () => handler(t) }><i className={`fa fa-tag`} /> {t}</span>
+          return <span className={`tag-label${active}`} key={t} onClick={ () => handler(t) }><i className={`fa fa-tag`} />{t}</span>
         })}
       </div>
     );
