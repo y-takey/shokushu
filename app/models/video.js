@@ -23,7 +23,7 @@ function filterByTag(tag) {
 }
 
 function insert(entity) {
-  attrs = Object.assign(_.cloneDeep(fileTmpl), entity)
+  let attrs = Object.assign(_.cloneDeep(fileTmpl), entity)
   return db(TABLE).push(attrs);
 }
 
