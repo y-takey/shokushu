@@ -207,7 +207,7 @@ class Viewer extends Component {
 
   createSlider() {
     return (
-      <div style={ { display: 'inline-block', width: '40%', height: '55px'} } >
+      <div>
         <Slider
           ref="slider"
           max={this.state.duration}
@@ -244,38 +244,41 @@ class Viewer extends Component {
   }
 
   controlButtons() {
-    const style = {
-      marginRight: 20,
-    };
-    let btn = (icons, handler) => {
-      let icon
-      if (_.isArray(icons)) {
-        icon = (
-          <span className="fa-stack fa-lg">
-            <i className={`fa fa-${icons[0]} fa-stack-1x`} />
-            <i className={`fa fa-${icons[1]} fa-stack-1x`} style={ { color: "black", fontSize: "70%" } }/>
-          </span>
-        )
-      } else {
-        icon = <i className={`fa fa-${icons}`} />
-      }
+    let btn = (icon, shortcut, handler) => {
       return (
-        <FloatingActionButton style={style} onClick={handler.bind(this)}>
-          {icon}
-        </FloatingActionButton>
+        <FlatButton primary={true} onClick={handler.bind(this)} className="video-btn">
+          <i className={`fa fa-${icon}`} /><br />
+          <span className="video-btn-shortcut">{shortcut}</span><br />
+        </FlatButton>
       )
     }
-    return ([
-      btn("step-backward", this.stepBackward),
-      (this.state.playing ? btn("stop", this.stop) : btn("play", this.play)),
-      btn("step-forward", this.stepForward),
-      btn("bookmark", this.handleAddBookmark),
-      btn(["bookmark", "arrow-left"], this.handlePrevBookmark),
-      btn(["bookmark", "arrow-right"], this.handleNextBookmark),
-      (this.state.fullscreen ? btn("compress", this.exitFullscreen) : btn("expand", this.fullscreen)),
-      this.createSlider(),
-      <span>{this.mmss(this.state.currentTime)}</span>
-    ])
+    return (
+      <table className="video-control-panel">
+        <tbody>
+        <tr>
+          <td width="40%">
+            { btn("step-backward", "←", this.stepBackward) }
+            { this.state.playing ?
+              btn("stop", "ENT", this.stop) :
+              btn("play", "ENT", this.play) }
+            { btn("step-forward", "→", this.stepForward) }
+            { btn("bookmark", "B", this.handleAddBookmark) }
+            { btn("fast-backward", "↓", this.handlePrevBookmark) }
+            { btn("fast-forward", "↑", this.handleNextBookmark) }
+            { this.state.fullscreen ?
+              btn("compress", "ESC", this.exitFullscreen) :
+              btn("expand", "F", this.fullscreen) }
+          </td>
+          <td width="50%">
+            { this.createSlider() }
+          </td>
+          <td>
+            <span className="video-current-time">&nbsp;&nbsp;{this.mmss(this.state.currentTime)}</span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    )
   }
 
   render() {
