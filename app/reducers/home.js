@@ -22,15 +22,18 @@ function getFiles() {
     return _([]);
   }
 
+  let files = []
   fs.readdirSync(dirPath).map((filename)=> {
     let obj = Video.find({ name: filename});
     if (!obj) {
       let stats = fs.statSync(dirPath + "/" + filename);
       obj = { name: filename, registered_at: dateFormat(stats.birthtime) }
-      Video.insert(obj)
+      obj = Video.insert(obj)
     }
+    files.push(obj)
   })
-  return Video.all();
+
+  return _(files);
 }
 
 function changeDir(state, action) {
@@ -69,7 +72,7 @@ function showDetail(state, action) {
 
 function updateFav(state, action) {
   Video.update({ name: action.file.name }, action.file);
-  return { files: Video.all() };
+  return { files: getFiles() };
 }
 
 function saveAttrs(state, atcion) {
@@ -78,7 +81,7 @@ function saveAttrs(state, atcion) {
     fs.renameSync(state.dirPath + "/" + video.originName, state.dirPath + "/" + video.name);
   }
   Video.update({ name: video.originName }, video);
-  return { files: Video.all(), tags: refreshTags() };
+  return { files: getFiles(), tags: refreshTags(), selectedFile: undefined };
 }
 
 function refreshTags() {
