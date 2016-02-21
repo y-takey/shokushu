@@ -16,8 +16,11 @@ function addBookmark(state, action) {
 }
 
 function removeBookmark(state, action) {
-  console.log("[viewer#removeBookmark]")
-  return { bookmarks: [] }
+  let bookmarks = action.file.bookmarks || []
+  _.pull(bookmarks, action.bookmark)
+  Video.update({ name: action.file.name }, { bookmarks: bookmarks });
+  action.file.bookmarks = bookmarks
+  return { file: action.file }
 }
 
 

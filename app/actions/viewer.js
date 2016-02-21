@@ -9,9 +9,10 @@ export function addBookmark(file, time) {
   };
 }
 
-export function removeBookmark() {
+export function removeBookmark(file, bookmark) {
   return {
     type: REMOVE_BOOKMARK,
-    index: 1
+    file: file,
+    bookmark: bookmark
   };
 }

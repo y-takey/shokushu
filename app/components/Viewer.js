@@ -176,6 +176,12 @@ class Viewer extends Component {
     this.refs.video.currentTime = bookmark
   }
 
+  removeBookmark(e, bookmark) {
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+    this.props.removeBookmark(this.state.file, bookmark);
+  }
+
   mmss(sec) {
     const pad = (val) => { return ("0" + val).slice(-2); };
     let ss = sec % 60 || 0;
@@ -225,7 +231,7 @@ class Viewer extends Component {
     const style = {
       marginRight: 20,
     };
-    let file = this.props.location.state.file
+    let file = this.props.file || this.props.location.state.file
     let tags = _.map(file.tags, "text");
     let bookmarks = file.bookmarks || []
     let filename = this.props.params.filename
@@ -271,13 +277,13 @@ class Viewer extends Component {
             <CardTitle title={filename} />
             <CardText>
               <TagLabels tags={tags} />
-              <List subheader="Bookmarks" insetSubheader={true} style={ { width: 300 } }>
+              <List subheader="Bookmarks" insetSubheader={false} style={ { width: 300 } }>
                 {bookmarks.map( (bookmark) => {
                   return(
                     <ListItem
                       key={bookmark}
                       leftAvatar={<Avatar icon={<i className="fa fa-bookmark" />} />}
-                      rightIcon={<i className="fa fa-remove" />}
+                      rightIcon={<i className="fa fa-remove" onClick={ (e) => this.removeBookmark(e, bookmark) } />}
                       primaryText={this.mmss(bookmark)}
                       onClick={ () => this.goBookmark(bookmark) }
                     />
