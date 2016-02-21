@@ -3,23 +3,12 @@ import React, { Component } from 'react';
 import { Link } from 'react-router';
 import TableRow from 'material-ui/lib/table/table-row';
 import TableRowColumn from 'material-ui/lib/table/table-row-column';
-import IconButton from 'material-ui/lib/icon-button';
 import TagLabels from './TagLabels';
-
-const favStyle= {
-  fontSize: 15,
-  paddingLeft: 0,
-  width: 20
-}
+import FavStars from './FavStars';
 
 export default class Item extends Component {
   constructor(props, context) {
     super(props, context)
-  }
-
-  stopPropagation(event) {
-    event.stopPropagation();
-    event.nativeEvent.stopImmediatePropagation();
   }
 
   render() {
@@ -34,13 +23,7 @@ export default class Item extends Component {
           <TagLabels tags={tags} />
         </TableRowColumn>
         <TableRowColumn>
-          {_.times(5, (i) => {
-            return (
-              <IconButton key={file.name + i} onClick={ (e) => { this.stopPropagation(e); this.props.updater(file.name, i + 1)} } style={ favStyle } className="fav-star">
-                <i className={file.fav > i ? "fa fa-star" : "fa fa-star-o"}></i>
-              </IconButton>
-            )
-          })}
+          <FavStars fav={file.fav} onClick={ (i) => { this.props.updater(file.name, i + 1)} } />
         </TableRowColumn>
         <TableRowColumn>
           {this.props.file.registered_at}
