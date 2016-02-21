@@ -132,8 +132,8 @@ class Viewer extends Component {
     const eventDispatcher = {
       [Keys.LEFT_ARROW]:  () => this.stepBackward(),
       [Keys.RIGHT_ARROW]: () => this.stepForward(),
-      [Keys.UP_ARROW]:    () => this.stepForward(),
-      [Keys.DOWN_ARROW]:  () => this.stepForward(),
+      [Keys.UP_ARROW]:    () => this.handleNextBookmark(),
+      [Keys.DOWN_ARROW]:  () => this.handlePrevBookmark(),
       [Keys.ENTER]:       () => this.state.playing ? this.stop() : this.play(),
       [Keys.ESCAPE]:      () => this.exitFullscreen(),
       [Keys.SPACE]:       () => this.evacuate(),
@@ -172,6 +172,22 @@ class Viewer extends Component {
     this.props.addBookmark(this.state.file, this.refs.video.currentTime)
   }
 
+  handlePrevBookmark(e) {
+    let bookmarks = this.state.file.bookmarks
+    let currentTime = this.refs.video.currentTime
+    let bookmark = _.findLast(bookmarks, (bookmark) => bookmark < currentTime )
+    if (!bookmark) { return }
+    this.goBookmark(bookmark)
+  }
+
+  handleNextBookmark(e) {
+    let bookmarks = this.state.file.bookmarks
+    let currentTime = this.refs.video.currentTime
+    let bookmark = _.find(bookmarks, (bookmark) => bookmark > currentTime )
+    if (!bookmark) { return }
+    this.goBookmark(bookmark)
+  }
+
   goBookmark(bookmark) {
     this.refs.video.currentTime = bookmark
   }
@@ -191,7 +207,7 @@ class Viewer extends Component {
 
   createSlider() {
     return (
-      <div style={ { display: 'inline-block', width: '60%', height: '55px'} } >
+      <div style={ { display: 'inline-block', width: '40%', height: '55px'} } >
         <Slider
           ref="slider"
           max={this.state.duration}
@@ -231,10 +247,21 @@ class Viewer extends Component {
     const style = {
       marginRight: 20,
     };
-    let btn = (icon, handler) => {
+    let btn = (icons, handler) => {
+      let icon
+      if (_.isArray(icons)) {
+        icon = (
+          <span className="fa-stack fa-lg">
+            <i className={`fa fa-${icons[0]} fa-stack-1x`} />
+            <i className={`fa fa-${icons[1]} fa-stack-1x`} style={ { color: "black", fontSize: "70%" } }/>
+          </span>
+        )
+      } else {
+        icon = <i className={`fa fa-${icons}`} />
+      }
       return (
         <FloatingActionButton style={style} onClick={handler.bind(this)}>
-          <i className={`fa fa-${icon}`}></i>
+          {icon}
         </FloatingActionButton>
       )
     }
@@ -242,6 +269,9 @@ class Viewer extends Component {
       btn("step-backward", this.stepBackward),
       (this.state.playing ? btn("stop", this.stop) : btn("play", this.play)),
       btn("step-forward", this.stepForward),
+      btn("bookmark", this.handleAddBookmark),
+      btn(["bookmark", "arrow-left"], this.handlePrevBookmark),
+      btn(["bookmark", "arrow-right"], this.handleNextBookmark),
       (this.state.fullscreen ? btn("compress", this.exitFullscreen) : btn("expand", this.fullscreen)),
       this.createSlider(),
       <span>{this.mmss(this.state.currentTime)}</span>
