@@ -132,8 +132,8 @@ class Viewer extends Component {
     const eventDispatcher = {
       [Keys.LEFT_ARROW]:  () => this.stepBackward(),
       [Keys.RIGHT_ARROW]: () => this.stepForward(),
-      [Keys.UP_ARROW]:    () => this.handleNextBookmark(),
-      [Keys.DOWN_ARROW]:  () => this.handlePrevBookmark(),
+      [Keys.UP_ARROW]:    () => this.handlePrevBookmark(),
+      [Keys.DOWN_ARROW]:  () => this.handleNextBookmark(),
       [Keys.ENTER]:       () => this.state.playing ? this.stop() : this.play(),
       [Keys.ESCAPE]:      () => this.exitFullscreen(),
       [Keys.SPACE]:       () => this.evacuate(),
@@ -263,8 +263,8 @@ class Viewer extends Component {
               btn("play", "ENT", this.play) }
             { btn("step-forward", "→", this.stepForward) }
             { btn("bookmark", "B", this.handleAddBookmark) }
-            { btn("fast-backward", "↓", this.handlePrevBookmark) }
-            { btn("fast-forward", "↑", this.handleNextBookmark) }
+            { btn("fast-backward", "↑", this.handlePrevBookmark) }
+            { btn("fast-forward", "↓", this.handleNextBookmark) }
             { this.state.fullscreen ?
               btn("compress", "ESC", this.exitFullscreen) :
               btn("expand", "F", this.fullscreen) }
