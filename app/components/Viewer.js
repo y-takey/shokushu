@@ -227,15 +227,10 @@ class Viewer extends Component {
     )
   }
 
-  render() {
+  controlButtons() {
     const style = {
       marginRight: 20,
     };
-    let file = this.props.file || this.props.location.state.file
-    let tags = _.map(file.tags, "text");
-    let bookmarks = file.bookmarks || []
-    let filename = this.props.params.filename
-    let filePath = this.props.dirPath + "/" + filename
     let btn = (icon, handler) => {
       return (
         <FloatingActionButton style={style} onClick={handler.bind(this)}>
@@ -243,6 +238,22 @@ class Viewer extends Component {
         </FloatingActionButton>
       )
     }
+    return ([
+      btn("step-backward", this.stepBackward),
+      (this.state.playing ? btn("stop", this.stop) : btn("play", this.play)),
+      btn("step-forward", this.stepForward),
+      (this.state.fullscreen ? btn("compress", this.exitFullscreen) : btn("expand", this.fullscreen)),
+      this.createSlider(),
+      <span>{this.mmss(this.state.currentTime)}</span>
+    ])
+  }
+
+  render() {
+    let file = this.props.file || this.props.location.state.file
+    let tags = _.map(file.tags, "text");
+    let bookmarks = file.bookmarks || []
+    let filename = this.props.params.filename
+    let filePath = this.props.dirPath + "/" + filename
     let dummyScreen = null;
     if (this.state.evacuate) {
       dummyScreen = <DummyScreen />
@@ -263,14 +274,7 @@ class Viewer extends Component {
           <Card>
             <CardMedia ref="videocard" style={ this.state.fullscreen ? { width: screen.width } : {} }
               overlayStyle={ { display: (this.state.showBar ? 'block' : 'none') } }
-              overlay={[
-                btn("step-backward", this.stepBackward),
-                (this.state.playing ? btn("stop", this.stop) : btn("play", this.play)),
-                btn("step-forward", this.stepForward),
-                (this.state.fullscreen ? btn("compress", this.exitFullscreen) : btn("expand", this.fullscreen)),
-                this.createSlider(),
-                <span>{this.mmss(this.state.currentTime)}</span>
-              ]}
+              overlay={this.controlButtons()}
             >
               <video autoPlay src={filePath} ref="video"></video>
             </CardMedia>
