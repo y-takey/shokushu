@@ -9,6 +9,7 @@ import CardText from 'material-ui/lib/card/card-text';
 import FloatingActionButton from 'material-ui/lib/floating-action-button';
 import TextField from 'material-ui/lib/text-field';
 import { WithContext as ReactTags } from 'react-tag-input';
+import FavStars from './FavStars';
 
 const style = {
   marginRight: 20,
@@ -60,7 +61,17 @@ export default class Detail extends Component {
       <LeftNav width={300} openRight={true} open={true} >
         <Card>
           <CardText>
+            <FloatingActionButton>
+              <i className={"fa fa-remove"} />
+            </FloatingActionButton>
+            <FloatingActionButton style={ { float: "right" } } secondary={true} onClick={updater}>
+              <i className={"fa fa-check"} />
+            </FloatingActionButton>
+            <br /><br />
             <TextField ref="name" value={file.name} onChange={updateName}/>
+            <span>{file.registered_at}</span>
+            <FavStars fav={file.fav} onClick={ (i) => { } } />
+
             <ReactTags ref="tag" tags={file.tags}
                     suggestions={this.suggestions()}
                     handleDelete={deleteTag}
@@ -72,12 +83,6 @@ export default class Detail extends Component {
                     autocomplete={1} />
           </CardText>
           <CardActions>
-            <FloatingActionButton style={style}>
-              <i className={"fa fa-remove"} />
-            </FloatingActionButton>
-            <FloatingActionButton style={style} secondary={true} onClick={updater}>
-              <i className={"fa fa-check"} />
-            </FloatingActionButton>
           </CardActions>
         </Card>
       </LeftNav>
