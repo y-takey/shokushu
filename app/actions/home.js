@@ -7,6 +7,7 @@ export const SORT_BY_NAME = 'SORT_BY_NAME';
 export const SHOW_DETAIL = 'SHOW_DETAIL';
 export const UPDATE_FAV = 'UPDATE_FAV';
 export const SAVE_ATTRS = 'SAVE_ATTRS';
+export const CLOSE_DETAIL = 'CLOSE_DETAIL';
 export const UPDATE_NAME = 'UPDATE_NAME';
 export const ADD_TAG = 'ADD_TAG';
 export const DELETE_TAG = 'DELETE_TAG';
@@ -58,6 +59,11 @@ export function updateFav(name, fav) {
   }
 }
 
+export function closeDetail() {
+  return {
+    type: CLOSE_DETAIL
+  }
+}
 export function saveAttrs(name, attrs) {
   return {
     type: SAVE_ATTRS

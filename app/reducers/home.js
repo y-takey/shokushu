@@ -4,7 +4,7 @@ import * as Config from '../models/config'
 import * as Video from '../models/video'
 
 import { CHANGE_DIR, FILTER_TAG, SORT_BY_NAME, SHOW_DETAIL,
-  UPDATE_FAV, SAVE_ATTRS, UPDATE_NAME, ADD_TAG, DELETE_TAG } from '../actions/home';
+  UPDATE_FAV, SAVE_ATTRS, CLOSE_DETAIL, UPDATE_NAME, ADD_TAG, DELETE_TAG } from '../actions/home';
 
 function dateFormat(date) {
   const pad = (val) => { return ("0" + val).slice(-2); }
@@ -84,6 +84,10 @@ function saveAttrs(state, atcion) {
   return { files: getFiles(), tags: refreshTags(), selectedFile: undefined };
 }
 
+function closeDetail(state, action) {
+  return { selectedFile: undefined };
+}
+
 function refreshTags() {
   let tags = Video.all().transform( (result, video)=> {
     _.each(video.tags, (tag)=> {
@@ -129,6 +133,7 @@ const dispatcher = {
   [SHOW_DETAIL]: showDetail,
   [UPDATE_FAV]: updateFav,
   [SAVE_ATTRS]: saveAttrs,
+  [CLOSE_DETAIL]: closeDetail,
   [UPDATE_NAME]: updateName,
   [ADD_TAG]: addTag,
   [DELETE_TAG]: deleteTag

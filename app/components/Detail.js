@@ -56,12 +56,12 @@ export default class Detail extends Component {
   }
 
   render() {
-    const { file, updater, updateName, addTag, deleteTag } = this.props;
+    const { file, updater, closer, updateName, addTag, deleteTag } = this.props;
     return (
       <LeftNav width={300} openRight={true} open={true} >
         <Card>
           <CardText>
-            <FloatingActionButton>
+            <FloatingActionButton onClick={closer}>
               <i className={"fa fa-remove"} />
             </FloatingActionButton>
             <FloatingActionButton style={ { float: "right" } } secondary={true} onClick={updater}>

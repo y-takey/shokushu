@@ -47,7 +47,7 @@ export default class Home extends Component {
   }
 
   render() {
-    const { changeDir, filterTag, sortByName, updateFav, showDetail, saveAttrs, updateName, addTag, deleteTag } = this.props
+    const { changeDir, filterTag, sortByName, updateFav, showDetail, saveAttrs, closeDetail, updateName, addTag, deleteTag } = this.props
     const { dirPath, tag, files, selectedFile, tags } = this.props.home
 
     let detail = null;
@@ -59,6 +59,7 @@ export default class Home extends Component {
         updateName={updateName}
         addTag={addTag}
         deleteTag={deleteTag}
+        closer={closeDetail}
       />
     }
 
