@@ -20,6 +20,7 @@ import DummyScreen from './DummyScreen';
 
 // Constants
 const Keys = {
+  BACK_SPACE: 8,
   ENTER: 13,
   ESCAPE: 27,
   LEFT_ARROW: 37,
@@ -41,7 +42,7 @@ class Viewer extends Component {
       'stepBackward', 'play', 'stop', 'stepForward',
       'handleKeyDown', 'handleFocus', 'handleMouseOver',
       'handleMouseOut', 'handleSlider', 'handleSliderChange', 'createThumbnail',
-      'goBookmark'
+      'goBookmark', 'goBack'
     )
   }
 
@@ -57,6 +58,7 @@ class Viewer extends Component {
       this.setState({ duration: this.refs.video.duration })
     });
     this.refs.video.addEventListener("timeupdate", () => {
+      if (!this.refs.video) { return }
       this.setState({ currentTime: Math.floor(this.refs.video.currentTime) })
     });
     this.state = {
@@ -73,6 +75,7 @@ class Viewer extends Component {
 
   componentWillUnmount() {
     document.removeEventListener('keydown', this.handleKeyDown);
+    document.removeEventListener('timeupdate');
     clearTimeout(this.hiddenTimer);
   }
 
@@ -130,6 +133,7 @@ class Viewer extends Component {
       return;
     }
     const eventDispatcher = {
+      [Keys.BACK_SPACE]:  () => this.goBack(),
       [Keys.LEFT_ARROW]:  () => this.stepBackward(),
       [Keys.RIGHT_ARROW]: () => this.stepForward(),
       [Keys.UP_ARROW]:    () => this.handlePrevBookmark(),
@@ -146,6 +150,10 @@ class Viewer extends Component {
 
     e.preventDefault();
     dispatcher();
+  }
+
+  goBack() {
+    this.props.history.goBack()
   }
 
   handleFocus(e) {
@@ -298,11 +306,9 @@ class Viewer extends Component {
         <div onMouseMove={this.onMouseMove} style={ {display: this.state.evacuate ? 'none' : 'block' } }>
           {this.createThumbnail()}
 
-          <div className={styles.backButton}>
-            <Link to="/">
-              <i className="fa fa-arrow-left fa-3x" />
-            </Link>
-          </div>
+          <FloatingActionButton onClick={this.goBack} style={ { marginBottom: 8 }}>
+            <i className={"fa fa-remove"} />
+          </FloatingActionButton>
 
           <Card>
             <CardMedia ref="videocard" style={ this.state.fullscreen ? { width: screen.width } : {} }
