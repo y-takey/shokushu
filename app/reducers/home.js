@@ -72,7 +72,7 @@ function showDetail(state, action) {
 
 function updateFav(state, action) {
   Video.update({ name: action.file.name }, action.file);
-  return { files: getFiles() };
+  return { files: Video.all() };
 }
 
 function saveAttrs(state, atcion) {
@@ -81,7 +81,7 @@ function saveAttrs(state, atcion) {
     fs.renameSync(state.dirPath + "/" + video.originName, state.dirPath + "/" + video.name);
   }
   Video.update({ name: video.originName }, video);
-  return { files: getFiles(), tags: refreshTags(), selectedFile: undefined };
+  return { files: Video.all(), tags: refreshTags(), selectedFile: undefined };
 }
 
 function closeDetail(state, action) {
