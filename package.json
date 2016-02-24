@@ -87,6 +87,7 @@
     "react-dnd": "^2.0.2",
     "react-dnd-html5-backend": "^2.0.2",
     "react-dom": "^0.14.2",
+    "react-infinite": "^0.8.0",
     "react-redux": "^4.0.5",
     "react-router": "^1.0.3",
     "react-tag-input": "^2.2.1",

@@ -1,11 +1,16 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import IconButton from 'material-ui/lib/icon-button';
+import MaterialColor from 'material-ui/lib/styles/colors'
 
 const style= {
   fontSize: 15,
   paddingLeft: 0,
-  width: 20
+  paddingTop: 4,
+  paddingBottom: 4,
+  width: 20,
+  height: 24,
+  color: MaterialColor.pink300
 }
 
 export default class FavStars extends Component {
@@ -18,7 +23,7 @@ export default class FavStars extends Component {
   render() {
     const { fav, onClick } = this.props
     return (
-      <div>
+      <span>
         {_.times(5, (i) => {
           return (
             <IconButton key={i} onClick={ (e) => { this.stopPropagation(e); onClick(i)} } style={ style } className="fav-star">
@@ -26,7 +31,7 @@ export default class FavStars extends Component {
             </IconButton>
           )
         })}
-      </div>
+      </span>
     );
   }
 }

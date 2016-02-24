@@ -68,7 +68,7 @@ a:hover {
   font-weight: bold;
   line-height: 1;
   color: #ffffff;
-  background-color: #00bcd4;
+  background-color: #039BE5;
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
@@ -111,8 +111,6 @@ a:hover {
   padding: .2em .6em .3em;
   font-weight: bold;
   line-height: 1;
-  color: #ffffff;
-  background-color: #00C853; /* #4CAF50;  /* #00bcd4; */
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
@@ -121,10 +119,6 @@ a:hover {
 }
 .tag-label.active {
   background-color: #FFC107; /* #ff4081; */
-}
-
-.fav-star {
-  color: #EC407A;
 }
 
 .video-control-panel {

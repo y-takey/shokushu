@@ -69,9 +69,10 @@ export default class Detail extends Component {
             </FloatingActionButton>
             <br /><br />
             <TextField ref="name" value={file.name} onChange={updateName}/>
-            <span>{file.registered_at}</span>
             <FavStars fav={file.fav} onClick={ (i) => { } } />
-
+            <br />
+            <span>{file.registered_at}</span>
+            <br /><br />
             <ReactTags ref="tag" tags={file.tags}
                     suggestions={this.suggestions()}
                     handleDelete={deleteTag}

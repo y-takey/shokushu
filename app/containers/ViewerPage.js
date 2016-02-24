@@ -1,10 +1,9 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Viewer from '../components/Viewer';
-import * as ViewerActions from '../actions/viewer';
+import * as ViewerActions from '../actions/ViewerActions';
 
 function mapStateToProps(state) {
-  console.log("[mapStateToProps] state:", state)
   return {
     dirPath: state.home.dirPath
   };

@@ -1,9 +1,8 @@
-export const ADD_BOOKMARK = 'ADD_BOOKMARK';
-export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
+import * as types from '../constants/ActionTypes';
 
 export function addBookmark(file, time) {
   return {
-    type: ADD_BOOKMARK,
+    type: types.ADD_BOOKMARK,
     file: file,
     time: Math.round(time)
   };
@@ -11,7 +10,7 @@ export function addBookmark(file, time) {
 
 export function removeBookmark(file, bookmark) {
   return {
-    type: REMOVE_BOOKMARK,
+    type: types.REMOVE_BOOKMARK,
     file: file,
     bookmark: bookmark
   };

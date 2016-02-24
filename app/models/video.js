@@ -9,6 +9,7 @@ const fileTmpl = { name: "", fav: 0, tags: [], registered_at: "" };
 
 
 function all() {
+  if (!Config.get("dirPath")) { return _([]) }
   return db(Config.get("dirPath"));
 }
 
@@ -30,6 +31,8 @@ function insert(entity) {
 
 function update(condition, attrs) {
   let updatables = _.pick(attrs, ['name', 'fav', 'tags', 'bookmarks'])
+  updatables.tags = _.sortBy(updatables.tags, "text")
+  updatables.bookmarks = _.sortBy(updatables.bookmarks)
   return db(Config.get("dirPath")).chain().find(condition).
     assign(updatables).value()
 }

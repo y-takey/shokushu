@@ -1,5 +1,6 @@
 import low from 'lowdb';
 import storage from 'lowdb/file-sync';
-const db = low('db.json', { storage });
+const dbFilename = "./db.json"
+const db = low(dbFilename, { storage });
 
-export { db };
+export { db, dbFilename };

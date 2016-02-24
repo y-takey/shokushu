@@ -1,10 +1,9 @@
 import fs from 'fs';
 import _ from 'lodash';
+import { db, dbFilename } from '../models/database';
 import * as Config from '../models/config'
 import * as Video from '../models/video'
-
-import { CHANGE_DIR, FILTER_TAG, SORT_BY_NAME, SHOW_DETAIL,
-  UPDATE_FAV, SAVE_ATTRS, CLOSE_DETAIL, UPDATE_NAME, ADD_TAG, DELETE_TAG } from '../actions/home';
+import * as types from '../constants/ActionTypes';
 
 function dateFormat(date) {
   const pad = (val) => { return ("0" + val).slice(-2); }
@@ -16,42 +15,60 @@ function dateFormat(date) {
   ].join('/')
 }
 
-function getFiles() {
-  let dirPath = Config.get("dirPath")
-  if (!dirPath) {
-    return _([]);
+function getFiles(state, { filter, sorter } = {} ) {
+  filter = filter || state.filter;
+  sorter = sorter || state.sorter;
+  let files;
+
+  if (filter.tag) {
+    files = Video.filterByTag(filter.tag)
+  } else {
+    files = Video.all().chain()
+  }
+  if (filter.fav) {
+    files = files.filter({ fav: filter.fav })
   }
 
-  let files = []
+  return files.orderBy([sorter.colName], [sorter.order]);
+}
+
+function loadFiles() {
+  let dirPath = Config.get("dirPath")
+  if (!dirPath) { return }
+
   fs.readdirSync(dirPath).map((filename)=> {
     let obj = Video.find({ name: filename});
-    if (!obj) {
-      let stats = fs.statSync(dirPath + "/" + filename);
-      obj = { name: filename, registered_at: dateFormat(stats.birthtime) }
-      obj = Video.insert(obj)
-    }
-    files.push(obj)
-  })
+    if (obj) { return }
 
-  return _(files);
+    let stats = fs.statSync(dirPath + "/" + filename);
+    obj = { name: filename, registered_at: dateFormat(stats.birthtime) }
+    Video.insert(obj)
+  })
+}
+
+function reloadDir(state, action) {
+  loadFiles()
+  return { files: getFiles(state) }
 }
 
 function changeDir(state, action) {
+  if (!action.dirPath) { return state }
+
   Config.set("dirPath", action.dirPath)
-  return { dirPath: action.dirPath, files: getFiles() }
+  loadFiles()
+  return { dirPath: action.dirPath, files: getFiles(state) }
 }
 
-function filterTag(state, action) {
-  let tag, files;
+function filterBy(state, action) {
+  let filter = state.filter || {}
 
-  if (state.tag === action.tag) {
-    tag = undefined;
-    files = Video.all();
+  if (filter[action.key] === action.value) {
+    delete filter[action.key];
   } else {
-    tag = action.tag
-    files = Video.filterByTag(tag)
+    filter[action.key] = action.value;
   }
-  return { tag: tag, files: files }
+
+  return { filter: filter, files: getFiles(state, { filter: filter }) }
 }
 
 function sortBy(state, action) {
@@ -60,19 +77,20 @@ function sortBy(state, action) {
   if (state.sorter.colName == colName && state.sorter.order == "asc") {
     sorter.order = "desc";
   }
-  let files = state.files.chain().orderBy([colName], [sorter.order]);
-  return { sorter: sorter, files: files, selectedFile: undefined };
+
+  return { sorter: sorter, files: getFiles(state, { sorter: sorter }),
+    selectedFile: undefined };
 }
 
 function showDetail(state, action) {
-  let file = _.cloneDeep(state.files.get(action.row));
+  let file = _.cloneDeep(state.files.get(action.row).value());
   file.originName = file.name;
   return { selectedFile: file };
 }
 
 function updateFav(state, action) {
   Video.update({ name: action.file.name }, action.file);
-  return { files: Video.all() };
+  return { files: getFiles(state) };
 }
 
 function saveAttrs(state, atcion) {
@@ -81,7 +99,7 @@ function saveAttrs(state, atcion) {
     fs.renameSync(state.dirPath + "/" + video.originName, state.dirPath + "/" + video.name);
   }
   Video.update({ name: video.originName }, video);
-  return { files: Video.all(), tags: refreshTags(), selectedFile: undefined };
+  return { files: getFiles(state), tags: refreshTags(), selectedFile: undefined };
 }
 
 function closeDetail(state, action) {
@@ -104,39 +122,49 @@ function updateName(state, action) {
   return { selectedFile: state.selectedFile };
 }
 
-function addTag(state, action) {
-  let tags = state.selectedFile.tags;
-  tags.push({ id: tags.length + 1, text: action.tag });
+function updateTags(state, action) {
+  state.selectedFile.tags = action.tags;
   return { selectedFile: state.selectedFile };
 }
 
-function deleteTag(state, action) {
-  let tags = state.selectedFile.tags;
-  tags.splice(action.index, 1);
-  _.forEach(_.range(action.index, tags.length), (index) =>
-    tags[index].id = index + 1
-  )
-  return { selectedFile: state.selectedFile };
+function exportJSON(state, action) {
+  db.write(action.filename)
+
+  return state
 }
 
+function importJSON(state, action) {
+  if (!action.filename) { return state }
+
+  fs.writeFileSync(dbFilename, fs.readFileSync(action.filename))
+  db.read()
+
+  return { files: getFiles(state) }
+}
+
+const initialSorter = { colName: "name", order: "asc" }
+const initialFilter = {}
 const initialState = {
   dirPath: Config.get("dirPath"),
-  files: getFiles(),
-  sorter: { colName: "name", order: "asc" },
+  sorter: initialSorter,
+  filter: initialFilter,
+  files: getFiles(null, { sorter: initialSorter, filter: initialFilter }),
   tags: Config.get("tags") || []
 }
 
 const dispatcher = {
-  [CHANGE_DIR]: changeDir,
-  [FILTER_TAG]: filterTag,
-  [SORT_BY_NAME]: sortBy,
-  [SHOW_DETAIL]: showDetail,
-  [UPDATE_FAV]: updateFav,
-  [SAVE_ATTRS]: saveAttrs,
-  [CLOSE_DETAIL]: closeDetail,
-  [UPDATE_NAME]: updateName,
-  [ADD_TAG]: addTag,
-  [DELETE_TAG]: deleteTag
+  [types.CHANGE_DIR]: changeDir,
+  [types.RELOAD_DIR]: reloadDir,
+  [types.FILTER_BY]: filterBy,
+  [types.SORT_BY]: sortBy,
+  [types.SHOW_DETAIL]: showDetail,
+  [types.UPDATE_FAV]: updateFav,
+  [types.SAVE_ATTRS]: saveAttrs,
+  [types.CLOSE_DETAIL]: closeDetail,
+  [types.UPDATE_NAME]: updateName,
+  [types.UPDATE_TAGS]: updateTags,
+  [types.EXPORT_JSON]: exportJSON,
+  [types.IMPORT_JSON]: importJSON
 }
 
 export default function home(state = initialState, action) {

@@ -1,12 +1,20 @@
+import { ipcRenderer } from 'electron';
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router';
 import routes from './routes';
 import configureStore from './store/configureStore';
+import { exportJSON, importJSON } from './actions/HomeActions';
 import './app.css';
 
 const store = configureStore();
+
+ipcRenderer.on(
+  'export-json', (event) => store.dispatch(exportJSON())
+).on(
+  'import-json', (event) => store.dispatch(importJSON())
+)
 
 render(
   <Provider store={store}>

@@ -14,7 +14,6 @@ import List from 'material-ui/lib/lists/list';
 import ListItem from 'material-ui/lib/lists/list-item';
 import Avatar from 'material-ui/lib/avatar';
 import { Link } from 'react-router';
-import styles from './Viewer.module.css';
 import TagLabels from './TagLabels';
 import DummyScreen from './DummyScreen';
 

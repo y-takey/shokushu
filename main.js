@@ -44,21 +44,31 @@ app.on('ready', () => {
     mainWindow.openDevTools();
   }
 
+  let helpMenu = {
+    label: 'Help',
+    submenu: [{
+      label: 'Documentation',
+      click() {
+        shell.openExternal('https://github.com/y-takey/shokushu/blob/master/README.md');
+      }
+    }, {
+      label: 'Search Issues',
+      click() {
+        shell.openExternal('https://github.com/y-takey/shokushu/issues');
+      }
+    }]
+  }
+
   if (process.platform === 'darwin') {
     template = [{
-      label: 'Electron',
+      label: 'Shokushu',
       submenu: [{
-        label: 'About ElectronReact',
+        label: 'About Shokushu',
         selector: 'orderFrontStandardAboutPanel:'
       }, {
         type: 'separator'
       }, {
-        label: 'Services',
-        submenu: []
-      }, {
-        type: 'separator'
-      }, {
-        label: 'Hide ElectronReact',
+        label: 'Hide Shokushu',
         accelerator: 'Command+H',
         selector: 'hide:'
       }, {
@@ -78,33 +88,17 @@ app.on('ready', () => {
         }
       }]
     }, {
-      label: 'Edit',
+      label: 'File',
       submenu: [{
-        label: 'Undo',
-        accelerator: 'Command+Z',
-        selector: 'undo:'
+        label: 'JSON export',
+        click() {
+          mainWindow.webContents.send('export-json');
+        }
       }, {
-        label: 'Redo',
-        accelerator: 'Shift+Command+Z',
-        selector: 'redo:'
-      }, {
-        type: 'separator'
-      }, {
-        label: 'Cut',
-        accelerator: 'Command+X',
-        selector: 'cut:'
-      }, {
-        label: 'Copy',
-        accelerator: 'Command+C',
-        selector: 'copy:'
-      }, {
-        label: 'Paste',
-        accelerator: 'Command+V',
-        selector: 'paste:'
-      }, {
-        label: 'Select All',
-        accelerator: 'Command+A',
-        selector: 'selectAll:'
+        label: 'JSON import',
+        click() {
+          mainWindow.webContents.send('import-json');
+        }
       }]
     }, {
       label: 'View',
@@ -149,44 +143,20 @@ app.on('ready', () => {
         label: 'Bring All to Front',
         selector: 'arrangeInFront:'
       }]
-    }, {
-      label: 'Help',
-      submenu: [{
-        label: 'Learn More',
-        click() {
-          shell.openExternal('http://electron.atom.io');
-        }
-      }, {
-        label: 'Documentation',
-        click() {
-          shell.openExternal('https://github.com/atom/electron/tree/master/docs#readme');
-        }
-      }, {
-        label: 'Community Discussions',
-        click() {
-          shell.openExternal('https://discuss.atom.io/c/electron');
-        }
-      }, {
-        label: 'Search Issues',
-        click() {
-          shell.openExternal('https://github.com/atom/electron/issues');
-        }
-      }]
-    }];
+    }, helpMenu];
 
-    menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
   } else {
     template = [{
       label: '&File',
       submenu: [{
-        label: '&Open',
-        accelerator: 'Ctrl+O'
-      }, {
-        label: '&Close',
-        accelerator: 'Ctrl+W',
+        label: 'JSON export',
         click() {
-          mainWindow.close();
+          mainWindow.webContents.send('export-json');
+        }
+      }, {
+        label: 'JSON import',
+        click() {
+          mainWindow.webContents.send('import-json');
         }
       }]
     }, {
@@ -216,31 +186,8 @@ app.on('ready', () => {
           mainWindow.setFullScreen(!mainWindow.isFullScreen());
         }
       }]
-    }, {
-      label: 'Help',
-      submenu: [{
-        label: 'Learn More',
-        click() {
-          shell.openExternal('http://electron.atom.io');
-        }
-      }, {
-        label: 'Documentation',
-        click() {
-          shell.openExternal('https://github.com/atom/electron/tree/master/docs#readme');
-        }
-      }, {
-        label: 'Community Discussions',
-        click() {
-          shell.openExternal('https://discuss.atom.io/c/electron');
-        }
-      }, {
-        label: 'Search Issues',
-        click() {
-          shell.openExternal('https://github.com/atom/electron/issues');
-        }
-      }]
-    }];
-    menu = Menu.buildFromTemplate(template);
-    mainWindow.setMenu(menu);
+    }, helpMenu];
   }
+  menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
 });

@@ -1,16 +1,14 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { Link } from 'react-router';
-import RaisedButton from 'material-ui/lib/raised-button';
+import IconButton from 'material-ui/lib/icon-button';
 import TextField from 'material-ui/lib/text-field';
-import Table from 'material-ui/lib/table/table';
-import TableHeader from 'material-ui/lib/table/table-header';
-import TableHeaderColumn from 'material-ui/lib/table/table-header-column';
-import TableRow from 'material-ui/lib/table/table-row';
-import TableBody from 'material-ui/lib/table/table-body';
+import List from 'material-ui/lib/lists/list';
 import LeftNav from 'material-ui/lib/left-nav';
-import styles from './Home.module.css';
+import Color from 'material-ui/lib/styles/colors';
+import Infinite from 'react-infinite';
 import Item from './Item';
+import Sidebar from './Sidebar';
 import TagLabels from './TagLabels';
 import Detail from './Detail';
 
@@ -19,22 +17,13 @@ const CustomTheme = {
   fontFamily: "Menlo, Consolas, 'DejaVu Sans Mono', monospace"
 }
 
-export default class Home extends Component {
+const buttonStyle = {
+  color: Color.cyan500
+}
 
-  static tableSettings = {
-    fixedHeader: true,
-    fixedFooter: true,
-    stripedRows: true,
-    showRowHover: false,
-    selectable: true,
-    multiSelectable: false,
-    enableSelectAll: false,
-    deselectOnClickaway: true,
-    height: '400px',
-    columnStyle: {
-      width: '10px'
-    }
-  };
+const sidebarWidth = 180;
+
+export default class Home extends Component {
 
   static get childContextTypes() {
     return { muiTheme: React.PropTypes.object };
@@ -46,58 +35,67 @@ export default class Home extends Component {
     }
   }
 
-  render() {
-    const { changeDir, filterTag, sortByName, updateFav, showDetail, saveAttrs, closeDetail, updateName, addTag, deleteTag } = this.props
-    const { dirPath, tag, files, selectedFile, tags } = this.props.home
-
-    let detail = null;
-    if (selectedFile) {
-      detail = <Detail
-        file={selectedFile}
-        tags={tags}
-        updater={saveAttrs}
-        updateName={updateName}
-        addTag={addTag}
-        deleteTag={deleteTag}
-        closer={closeDetail}
+  listItems() {
+    const { updateFav, showDetail } = this.props
+    const { files } = this.props.home
+    return files.value().map( (file, index) => {
+      return <Item
+        key={index}
+        file={file}
+        index={index}
+        updater={updateFav}
+        shower={showDetail}
       />
-    }
+    })
+  }
+
+  detailItem() {
+    const { saveAttrs, closeDetail, updateName, addTag, deleteTag } = this.props
+    const { selectedFile, tags } = this.props.home
+
+    if (!selectedFile) { return null; }
+
+    return <Detail
+      file={selectedFile}
+      tags={tags}
+      updater={saveAttrs}
+      updateName={updateName}
+      addTag={addTag}
+      deleteTag={deleteTag}
+      closer={closeDetail}
+    />
+  }
+
+  render() {
+    const { changeDir, reloadDir, filterBy, sortBy } = this.props
+    const { dirPath, tags, sorter, filter } = this.props.home
+    // body's height - dirPath's height - e.t.c(margin, padding)
+    let containerHight = document.body.clientHeight - 48 - 50
 
     return (
-      <div style={ { paddingLeft: 150 } } >
-      <RaisedButton label="change" secondary={true} onClick={changeDir} />&nbsp;
-      <TextField value={dirPath} disabled={true} style={ { width: '80%' } } inputStyle={ { color: "#424242" } } />
+      <div style={ { paddingLeft: sidebarWidth } } >
+      <IconButton
+        iconClassName="fa fa-folder-open"
+        tooltip="select"
+        iconStyle={ buttonStyle }
+        onClick={ changeDir }
+      />
+      <TextField value={dirPath} disabled={true} style={ { width: '75%' } } inputStyle={ { color: "#424242" } } />
+      <IconButton
+        iconClassName="fa fa-refresh"
+        tooltip="refresh"
+        iconStyle={ buttonStyle }
+        onClick={ reloadDir }
+      />
 
-      <LeftNav open={true} width={150}>
-        <TagLabels tags={_.keys(tags)} activeTag={tag} handler={filterTag} />
-      </LeftNav>
+      <Sidebar sortBy={sortBy} sorter={sorter} filterBy={filterBy} filter={filter} tags={tags} width={sidebarWidth} />
 
-      <Table
-        height={Home.tableSettings.height}
-        fixedHeader={Home.tableSettings.fixedHeader}
-        fixedFooter={Home.tableSettings.fixedFooter}
-        selectable={Home.tableSettings.selectable}
-        multiSelectable={Home.tableSettings.multiSelectable}
-      >
-        <TableHeader displaySelectAll={false} adjustForCheckbox={false} enableSelectAll={Home.tableSettings.enableSelectAll}>
-          <TableRow onCellClick={sortByName}>
-            <TableHeaderColumn style={Home.tableSettings.columnStyle}></TableHeaderColumn>
-            <TableHeaderColumn>Name</TableHeaderColumn>
-            <TableHeaderColumn>Fav</TableHeaderColumn>
-            <TableHeaderColumn>registered at</TableHeaderColumn>
-          </TableRow>
-        </TableHeader>
-        <TableBody
-          deselectOnClickaway={Home.tableSettings.deselectOnClickaway}
-          showRowHover={Home.tableSettings.showRowHover}
-          stripedRows={Home.tableSettings.stripedRows}
-        >
-          {files.value().map( (file, index) => {
-            return <Item key={file.name} file={file} index={index} columnStyle={Home.tableSettings.columnStyle} updater={updateFav} shower={showDetail}/>;
-          })}
-        </TableBody>
-      </Table>
-      { detail }
+      <List>
+      <Infinite containerHeight={containerHight} elementHeight={ 68 }>
+        { this.listItems() }
+      </Infinite>
+      </List>
+      { this.detailItem() }
       </div>
     );
   }

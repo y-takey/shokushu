@@ -1,9 +1,7 @@
 import * as Video from '../models/video'
-import { ADD_BOOKMARK, REMOVE_BOOKMARK } from '../actions/viewer';
-import { SHOW_DETAIL } from '../actions/home';
+import * as types from '../constants/ActionTypes';
 
 function addBookmark(state, action) {
-  console.log("[viewer#addBookmark]")
   let bookmarks = action.file.bookmarks || []
   let time = action.time
   if (_.includes(bookmarks, time)) {
@@ -23,26 +21,14 @@ function removeBookmark(state, action) {
   return { file: action.file }
 }
 
-
-// const initialState = {
-//   dirPath: Config.get("dirPath"),
-//   files: getFiles(),
-//   sorter: { colName: "name", order: "asc" },
-//   tags: Config.get("tags") || []
-// }
-
-console.log("viewer this 1:", this)
-
 const dispatcher = {
-  [ADD_BOOKMARK]: addBookmark,
-  [REMOVE_BOOKMARK]: removeBookmark
+  [types.ADD_BOOKMARK]: addBookmark,
+  [types.REMOVE_BOOKMARK]: removeBookmark
 }
 
-export default function home(state = {}, action) {
-  console.log("viewer this 2:", this)
+export default function viewer(state = {}, action) {
   let proc = dispatcher[action.type];
   if (!proc) {
-    console.log("[viewer]default reducer:", action.type)
     return state;
   }
 
