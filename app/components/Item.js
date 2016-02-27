@@ -38,7 +38,7 @@ export default class Item extends Component {
           <TagLabels key={2} tags={tags} />
         ]}
         secondaryTextLines={2}
-        onClick={ (e) => { console.log("clicked"); this.props.shower(index)} }
+        onClick={ (e) => this.props.shower(index) }
         innerDivStyle={ itemStyle }
       />
     );
