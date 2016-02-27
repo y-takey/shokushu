@@ -79,10 +79,12 @@
   "dependencies": {
     "electron-debug": "^0.5.1",
     "font-awesome": "^4.4.0",
+    "fs": "0.0.2",
     "history": "^1.17.0",
     "lodash": "^4.2.1",
     "lowdb": "^0.12.3",
     "material-ui": "^0.14.4",
+    "path": "^0.12.7",
     "react": "^0.14.2",
     "react-dnd": "^2.0.2",
     "react-dnd-html5-backend": "^2.0.2",
