@@ -12,7 +12,7 @@
     "start": "cross-env NODE_ENV=production electron ./",
     "start-hot": "cross-env HOT=1 NODE_ENV=development electron ./",
     "package": "cross-env NODE_ENV=production node package.js --name shokushu",
-    "package-all": "npm run package -- --all --name shokushu",
+    "package-all": "npm run package -- --all",
     "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json"
   },
   "bin": {
