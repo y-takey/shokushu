@@ -18,7 +18,7 @@ The application based on [electron-react-boilerplate](https://github.com/chentsu
 
 ## Install
 
-Download [here](https://github.com/y-takey/shokushu/blob/release/) to your pc
+Download [here](https://github.com/y-takey/shokushu/tree/master/release/darwin-x64/shokushu-darwin-x64) to your pc
 
 --
 
