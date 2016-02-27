@@ -39,6 +39,7 @@ function loadFiles() {
   fs.readdirSync(dirPath).map((filename)=> {
     let obj = Video.find({ name: filename});
     if (obj) { return }
+    if (!filename.match(/.+\.(mp4|ogv|webm)$/i)) { return }
 
     let stats = fs.statSync(dirPath + "/" + filename);
     obj = { name: filename, registered_at: dateFormat(stats.birthtime) }
