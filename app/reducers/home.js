@@ -90,7 +90,8 @@ function showDetail(state, action) {
 }
 
 function updateFav(state, action) {
-  Video.update({ name: action.file.name }, action.file);
+  let attrs = _.pick(action.file, ['fav'])
+  Video.update({ name: action.file.name }, attrs);
   return { files: getFiles(state) };
 }
 
