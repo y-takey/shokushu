@@ -31,6 +31,6 @@ node_modules
 
 # App packaged
 dist
-release
+# release
 
 db.json
