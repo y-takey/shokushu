@@ -27,7 +27,8 @@ const Keys = {
   RIGHT_ARROW: 39,
   DOWN_ARROW: 40,
   SPACE: 32,
-  B: 66
+  B: 66,
+  F: 70
 };
 
 const STEP = 10;
@@ -140,7 +141,8 @@ class Viewer extends Component {
       [Keys.ENTER]:       () => this.state.playing ? this.stop() : this.play(),
       [Keys.ESCAPE]:      () => this.exitFullscreen(),
       [Keys.SPACE]:       () => this.evacuate(),
-      [Keys.B]:           () => this.handleAddBookmark()
+      [Keys.B]:           () => this.handleAddBookmark(),
+      [Keys.F]:           () => this.fullscreen()
     }
 
     let dispatcher = eventDispatcher[e.keyCode]
