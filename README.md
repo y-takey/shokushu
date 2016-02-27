@@ -1,14 +1,28 @@
 # shokushu
 
 This application is Local video manage and player using electron.
+
+![list](https://github.com/y-takey/shokushu/blob/master/screenshots/list.png)
+![edit](https://github.com/y-takey/shokushu/blob/master/screenshots/edit.png)
+![view](https://github.com/y-takey/shokushu/blob/master/screenshots/view.png)
+
 The application based on [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate).
 
 ## Features
 
 1. Keyboard friendly
 1. Tagging and favorites the video
-1. Preview it when mouse hover on seekbar
+1. Preview it when mouse hover on the seekbar
+1. Bookmarking any playing position, and playing later
 1. Mamakita button (means showing emergency evacuation screen)
+
+## Install
+
+Download [here](https://github.com/y-takey/shokushu/blob/release/) to your pc
+
+--
+
+# Development
 
 ## Install
 
@@ -31,12 +45,7 @@ $ npm run start-hot
 *Note: requires a node version >= 4 and an npm version >= 2.*
 
 
-## CSS Modules support
-
-Import css file as [css-modules](https://github.com/css-modules/css-modules) using `.module.css`.
-
-
-## Package
+## Packaging
 
 ```bash
 $ npm run package
