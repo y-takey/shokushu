@@ -172,7 +172,6 @@ const dispatcher = {
 export default function home(state = initialState, action) {
   let proc = dispatcher[action.type];
   if (!proc) {
-    console.log("default reducer:", action.type)
     return state;
   }
 
