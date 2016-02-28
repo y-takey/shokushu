@@ -49,10 +49,7 @@ class Viewer extends Component {
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown);
     this.videoContainer = ReactDOM.findDOMNode(this.refs.videocard)
-    let track = ReactDOM.findDOMNode(this.refs.slider.refs.track)
-    this.trackLeft = this.refs.slider._getTrackLeft()
-    this.trackWidth = track.clientWidth;
-    this.trackY = track.getBoundingClientRect().top;
+    this.track = ReactDOM.findDOMNode(this.refs.slider.refs.track)
     this.hideActionBar();
     this.refs.video.addEventListener("loadedmetadata", () => {
       this.setState({ duration: this.refs.video.duration })
@@ -167,11 +164,15 @@ class Viewer extends Component {
     this.setState({ thumbnail: false })
   }
   handleSlider(e) {
-    let pos = e.clientX - this.trackLeft
-    if (pos < 0) pos = 0; else if (pos > this.trackWidth) pos = this.trackWidth;
-    let percent = Math.round(pos * 100 / this.trackWidth) / 100
+    let roundedX = Math.round(e.clientX / 10) * 10
+    if (roundedX === this.state.thumbnailPos) { return }
+
+    let trackWidth = this.track.clientWidth;
+    let pos = roundedX - this.refs.slider._getTrackLeft()
+    if (pos < 0) pos = 0; else if (pos > trackWidth) pos = trackWidth;
+    let percent = Math.round(pos * 100 / trackWidth) / 100
     this.refs.preview.currentTime = this.refs.video.duration * percent
-    this.setState({ thumbnailPos: e.clientX })
+    this.setState({ thumbnailPos: roundedX })
   }
   handleSliderChange(e, value) {
     this.refs.video.currentTime = Math.floor(value)
@@ -235,13 +236,18 @@ class Viewer extends Component {
     let pos = this.state.thumbnailPos || 0
     const width = 213;
     const height = 120;
+    let top = 0;
+    if (this.track && this.state.thumbnail) {
+      let margin = this.state.fullscreen ? 60 : 90;
+      top = (this.track.getBoundingClientRect().top + document.body.scrollTop - height - margin)
+    }
     const style = {
       display: this.state.thumbnail ? 'block' : 'none',
       width: width + 'px',
       height: height + 'px',
       position: 'absolute',
-      left: (pos - width / 2) + 'px',
-      top: (this.trackY - height / 2 - 20) + 'px',
+      left: '' + (pos - width / 2) + 'px',
+      top: '' + top + 'px',
       zIndex: 1000
     };
     let filePath = this.props.dirPath + "/" + this.props.params.filename
@@ -305,7 +311,6 @@ class Viewer extends Component {
       <div>
         {dummyScreen}
         <div onMouseMove={this.onMouseMove} style={ {display: this.state.evacuate ? 'none' : 'block' } }>
-          {this.createThumbnail()}
 
           <FloatingActionButton onClick={this.goBack} style={ { marginBottom: 8 }}>
             <i className={"fa fa-remove"} />
@@ -316,6 +321,7 @@ class Viewer extends Component {
               overlayStyle={ { display: (this.state.showBar ? 'block' : 'none') } }
               overlay={this.controlButtons()}
             >
+              {this.createThumbnail()}
               <video autoPlay src={filePath} ref="video"></video>
             </CardMedia>
             <CardTitle title={filename} />
