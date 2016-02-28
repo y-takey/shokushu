@@ -158,7 +158,7 @@ class Viewer extends Component {
   }
 
   handleFocus(e) {
-    console.log("+++ handleFocus")
+    // dummy func
   }
   handleMouseOver(e) {
     this.setState({ thumbnail: true })
