@@ -91,7 +91,7 @@ export default class Home extends Component {
       <Sidebar sortBy={sortBy} sorter={sorter} filterBy={filterBy} filter={filter} tags={tags} width={sidebarWidth} />
 
       <List>
-      <Infinite containerHeight={containerHight} elementHeight={ 68 }>
+      <Infinite containerHeight={containerHight} elementHeight={ 68 } useWindowAsScrollContainer>
         { this.listItems() }
       </Infinite>
       </List>
