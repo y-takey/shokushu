@@ -5,8 +5,24 @@ import * as Config from './config'
 
 const TABLE = "videos";
 
-const fileTmpl = { name: "", fav: 0, tags: [], registered_at: "" };
+const fileTmpl = {
+  name: "",
+  fav: 0,
+  tags: [],
+  registered_at: "",
+  last_viewed_at: "",
+  viewing_num: 0
+};
 
+function dateFormat(date) {
+  const pad = (val) => { return ("0" + val).slice(-2); }
+
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate())
+  ].join('/')
+}
 
 function all() {
   if (!Config.get("dirPath")) { return _([]) }
@@ -26,6 +42,7 @@ function filterByTag(tag) {
 
 function insert(entity) {
   let attrs = Object.assign(_.cloneDeep(fileTmpl), entity)
+  attrs.registered_at = dateFormat(attrs.registered_at)
   return db(Config.get("dirPath")).push(attrs);
 }
 
@@ -41,4 +58,12 @@ function update(condition, attrs) {
     assign(updatables).value()
 }
 
-export { all, find, filterByTag, insert, update }
+function countupViewing(condition) {
+  let file = find(condition);
+  file.viewing_num = file.viewing_num || 0;
+  ++file.viewing_num;
+  file.last_viewed_at = dateFormat(new Date())
+  return file
+}
+
+export { all, find, filterByTag, insert, update, countupViewing }

@@ -5,16 +5,6 @@ import * as Config from '../models/config'
 import * as Video from '../models/video'
 import * as types from '../constants/ActionTypes';
 
-function dateFormat(date) {
-  const pad = (val) => { return ("0" + val).slice(-2); }
-
-  return [
-    date.getFullYear(),
-    pad(date.getMonth() + 1),
-    pad(date.getDate())
-  ].join('/')
-}
-
 function getFiles(state, { filter, sorter } = {} ) {
   filter = filter || state.filter;
   sorter = sorter || state.sorter;
@@ -42,7 +32,7 @@ function loadFiles() {
     if (!filename.match(/.+\.(mp4|ogv|webm)$/i)) { return }
 
     let stats = fs.statSync(dirPath + "/" + filename);
-    obj = { name: filename, registered_at: dateFormat(stats.birthtime) }
+    obj = { name: filename, registered_at: stats.birthtime }
     Video.insert(obj)
   })
 }
