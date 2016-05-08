@@ -68,6 +68,9 @@ class Viewer extends Component {
       thumbnailPos: null,
       fullscreen: false
     }
+    setTimeout( () => {
+      this.props.viewVideo(this.state.file)
+    }, 3000);
   }
 
   componentWillUnmount() {

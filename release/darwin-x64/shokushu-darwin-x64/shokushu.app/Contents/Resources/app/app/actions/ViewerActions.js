@@ -1,5 +1,12 @@
 import * as types from '../constants/ActionTypes';
 
+export function viewVideo(file) {
+  return {
+    type: types.VIEW_VIDEO,
+    file: file
+  };
+}
+
 export function addBookmark(file, time) {
   return {
     type: types.ADD_BOOKMARK,

@@ -24,19 +24,35 @@ const fileStyle = {
 }
 
 export default class Item extends Component {
+  detail() {
+    const { upadter, file } = this.props;
+    let tags = _.map(file.tags, "text");
+    let viewingInfo = " -";
+    if (file.viewing_num) {
+      viewingInfo = `${file.viewing_num} (${file.last_viewed_at})`
+    }
+
+    return [
+      <FavStars key={1} fav={file.fav} onClick={ (i) => { updater(file.name, i + 1)} } />,
+      "  ",
+      <i key={2} className="fa fa-fw fa-plus" />,
+      file.registered_at,
+      "  ",
+      <i key={3} className="fa fa-fw fa-play" />,
+      viewingInfo,
+      "  ",
+      <TagLabels key={4} tags={tags} />
+    ]
+  }
+
   render() {
     const { index, file } = this.props
-    let tags = _.map(file.tags, "text");
 
     return (
       <ListItem
         leftAvatar={<Avatar style={ avatarStyle }>{index + 1}</Avatar>}
         primaryText={<Link to={`/viewer/${file.name}`} state={ { file: file } } style={ fileStyle } >{file.name}</Link>}
-        secondaryText={[
-          <FavStars key={1} fav={file.fav} onClick={ (i) => { this.props.updater(file.name, i + 1)} } />,
-          " ", file.registered_at,
-          <TagLabels key={2} tags={tags} />
-        ]}
+        secondaryText={this.detail()}
         secondaryTextLines={2}
         onClick={ (e) => this.props.shower(index) }
         innerDivStyle={ itemStyle }

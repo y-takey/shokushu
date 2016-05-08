@@ -1,6 +1,11 @@
 import * as Video from '../models/video'
 import * as types from '../constants/ActionTypes';
 
+function view(state, action) {
+  let file = Video.countupViewing({ name: action.file.name });
+  return { file: file }
+}
+
 function addBookmark(state, action) {
   let bookmarks = action.file.bookmarks || []
   let time = action.time
@@ -22,6 +27,7 @@ function removeBookmark(state, action) {
 }
 
 const dispatcher = {
+  [types.VIEW_VIDEO]: view,
   [types.ADD_BOOKMARK]: addBookmark,
   [types.REMOVE_BOOKMARK]: removeBookmark
 }

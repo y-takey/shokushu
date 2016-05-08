@@ -20,6 +20,14 @@ The application based on [electron-react-boilerplate](https://github.com/chentsu
 
 Download [here](https://github.com/y-takey/shokushu/tree/master/release/darwin-x64/shokushu-darwin-x64) to your pc
 
+## Upgrade
+
+1. select [JSON export] on application menu, and then save the file to local strage.
+1. replace your app with latest the app
+1. select [JSON import] on application menu, and then open your local file.
+
+*caution* just replace the app, json data will clear.
+
 --
 
 # Development

@@ -9,6 +9,7 @@ export const CLOSE_DETAIL = 'CLOSE_DETAIL';
 export const UPDATE_NAME = 'UPDATE_NAME';
 export const UPDATE_TAGS = 'UPDATE_TAGS';
 
+export const VIEW_VIDEO = 'VIEW_VIDEO';
 export const ADD_BOOKMARK = 'ADD_BOOKMARK';
 export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
 
