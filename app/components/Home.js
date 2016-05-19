@@ -50,7 +50,7 @@ export default class Home extends Component {
   }
 
   detailItem() {
-    const { saveAttrs, closeDetail, updateName, addTag, deleteTag } = this.props
+    const { saveAttrs, closeDetail, updateName, addTag, deleteTag, updateFav } = this.props
     const { selectedFile, tags } = this.props.home
 
     if (!selectedFile) { return null; }
@@ -59,6 +59,7 @@ export default class Home extends Component {
       file={selectedFile}
       tags={tags}
       updater={saveAttrs}
+      updateFav={updateFav}
       updateName={updateName}
       addTag={addTag}
       deleteTag={deleteTag}

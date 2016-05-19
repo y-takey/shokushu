@@ -40,6 +40,39 @@ function filterByTag(tag) {
   });
 }
 
+function similars_with_name(file) {
+  const prefix = file.name.slice(0, file.name.length * 0.5)
+  return all().filter((other) => {
+    return _.startsWith(other.name, prefix) &&
+      other.name !== file.name
+  })
+}
+
+function similars_with_tags(file) {
+  const FAV_LIMIT = 4
+  const text = f => f.text
+  const originTags = file.tags.map(text)
+  let date = new Date();
+  date.setMonth(date.getMonth() - 1);
+  const formattedDate = dateFormat(date);
+  return all().filter((other) => {
+    return (!other.fav || other.fav >= FAV_LIMIT) &&
+      (!other.last_viewed_at || other.last_viewed_at < formattedDate) &&
+      (!_.isEmpty(_.intersection(originTags, other.tags.map(text)))) &&
+      other.name !== file.name
+  });
+}
+
+function similars(file) {
+  const MAX_SIZE = 20
+  let ret = similars_with_name(file)
+  let ret2 = similars_with_tags(file)
+  // delete duplicated
+  _.pullAll(ret2, ret)
+
+  return _.flatten([ret, _.sampleSize(ret2, MAX_SIZE - ret.length)])
+}
+
 function insert(entity) {
   let attrs = Object.assign(_.cloneDeep(fileTmpl), entity)
   attrs.registered_at = dateFormat(attrs.registered_at)
@@ -66,4 +99,4 @@ function countupViewing(condition) {
   return file
 }
 
-export { all, find, filterByTag, insert, update, countupViewing }
+export { all, find, filterByTag, insert, update, countupViewing, similars }

@@ -6,6 +6,10 @@ function view(state, action) {
   return { file: file }
 }
 
+function recommend(state, action) {
+  return { similars: Video.similars(action.file) }
+}
+
 function addBookmark(state, action) {
   let bookmarks = action.file.bookmarks || []
   let time = action.time
@@ -28,6 +32,7 @@ function removeBookmark(state, action) {
 
 const dispatcher = {
   [types.VIEW_VIDEO]: view,
+  [types.RECOMMEND_VIDEO]: recommend,
   [types.ADD_BOOKMARK]: addBookmark,
   [types.REMOVE_BOOKMARK]: removeBookmark
 }

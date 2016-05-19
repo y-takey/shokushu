@@ -22,3 +22,10 @@ export function removeBookmark(file, bookmark) {
     bookmark: bookmark
   };
 }
+
+export function recommendVideo(file) {
+  return {
+    type: types.RECOMMEND_VIDEO,
+    file: file
+  };
+}

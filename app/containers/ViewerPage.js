@@ -5,7 +5,9 @@ import * as ViewerActions from '../actions/ViewerActions';
 
 function mapStateToProps(state) {
   return {
-    dirPath: state.home.dirPath
+    dirPath: state.home.dirPath,
+    similars: state.viewer.similars,
+    file: state.viewer.file
   };
 }
 

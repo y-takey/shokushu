@@ -56,7 +56,7 @@ export default class Detail extends Component {
   }
 
   render() {
-    const { file, updater, closer, updateName, addTag, deleteTag } = this.props;
+    const { file, updater, closer, updateName, addTag, deleteTag, updateFav } = this.props;
     return (
       <LeftNav width={300} openRight={true} open={true} >
         <Card>
@@ -69,7 +69,7 @@ export default class Detail extends Component {
             </FloatingActionButton>
             <br /><br />
             <TextField ref="name" value={file.name} onChange={updateName}/>
-            <FavStars fav={file.fav} onClick={ (i) => { } } />
+            <FavStars fav={file.fav} onClick={ (i) => { updateFav(file.name, i + 1)} } />
             <br />
             <span>{file.registered_at}</span>
             <br /><br />

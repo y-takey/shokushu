@@ -33,7 +33,7 @@ export default class Item extends Component {
     }
 
     return [
-      <FavStars key={1} fav={file.fav} onClick={ (i) => { updater(file.name, i + 1)} } />,
+      <FavStars key={1} fav={file.fav} onClick={ (i) => {} } />,
       "  ",
       <i key={2} className="fa fa-fw fa-plus" />,
       file.registered_at,

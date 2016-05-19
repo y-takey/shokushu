@@ -10,6 +10,7 @@ export const UPDATE_NAME = 'UPDATE_NAME';
 export const UPDATE_TAGS = 'UPDATE_TAGS';
 
 export const VIEW_VIDEO = 'VIEW_VIDEO';
+export const RECOMMEND_VIDEO = 'RECOMMEND_VIDEO';
 export const ADD_BOOKMARK = 'ADD_BOOKMARK';
 export const REMOVE_BOOKMARK = 'REMOVE_BOOKMARK';
 
